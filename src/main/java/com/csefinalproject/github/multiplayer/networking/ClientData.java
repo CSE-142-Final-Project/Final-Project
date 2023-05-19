@@ -1,7 +1,7 @@
 package com.csefinalproject.github.multiplayer.networking;
 
 public class ClientData {
-	public ClientData(String ip, short port) {
+	public ClientData(String ip, short port, String username) {
 
 	}
 

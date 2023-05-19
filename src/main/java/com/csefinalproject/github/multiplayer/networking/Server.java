@@ -1,4 +1,24 @@
 package com.csefinalproject.github.multiplayer.networking;
 
-public class Server {
+import com.csefinalproject.github.multiplayer.networking.packet.Packet;
+
+public class Server implements IPeer {
+    public void start(short port) {
+
+    }
+    public void stop() {
+
+    }
+    public void send(Packet packet, short client) {
+
+    }
+    public void broadcast(Packet packet) {
+
+    }
+    public Packet getNextPacket() {
+        return null;
+    }
+    public boolean hasNextPacket() {
+        return false;
+    }
 }
