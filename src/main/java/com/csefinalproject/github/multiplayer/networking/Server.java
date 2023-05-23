@@ -15,6 +15,9 @@ public class Server implements IPeer {
     public void broadcast(Packet packet) {
 
     }
+    public ClientData[] getClientData() {
+        return null;
+    }
     public Packet getNextPacket() {
         return null;
     }
