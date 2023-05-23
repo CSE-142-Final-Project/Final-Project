@@ -1,4 +1,5 @@
-package com.buildingjavaprograms.drawingpanel;/*
+package com.buildingjavaprograms.drawingpanel;
+/*
  * =====================================================================
  * com.buildingjavaprograms.drawingpanel.DrawingPanel.java
  * Simplified Java drawing window class
