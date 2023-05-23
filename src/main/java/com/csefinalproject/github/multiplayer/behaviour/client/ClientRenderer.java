@@ -3,15 +3,30 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 
 public class ClientRenderer {
-	private final int PANEL_WIDTH = 854;
-	private final int PANEL_HEIGHT = 480;
+	private int screenWidth = 854;
+	private int screenHeight = 480;
 
 	private DrawingPanel drawingPanel;
 
 	public ClientRenderer() {
-		// Create DrawingPanel
 		System.out.println("[CLIENT] Creating DrawingPanel.");
-		drawingPanel = new DrawingPanel(PANEL_WIDTH, PANEL_HEIGHT);
+		this.drawingPanel = new DrawingPanel(this.screenWidth, this.screenHeight);
+	}
+
+	public ClientRenderer(int screenWidth, int screenHeight) {
+		this.screenWidth = screenWidth;
+		this.screenHeight = screenHeight;
+
+		System.out.println("[CLIENT] Creating DrawingPanel.");
+		this.drawingPanel = new DrawingPanel(this.screenWidth, this.screenHeight);
+	}
+
+	public int getScreenWidth() {
+		return screenWidth;
+	}
+
+	public int getScreenHeight() {
+		return screenHeight;
 	}
 
 	public DrawingPanel getDrawingPanel() {

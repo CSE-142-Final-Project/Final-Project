@@ -1,5 +1,7 @@
 package com.csefinalproject.github.multiplayer.behaviour.shared;
 
+import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
+
 import java.awt.Point;
 
 public class Entity {
@@ -13,6 +15,17 @@ public class Entity {
 		this.name = name;
 		this.pathToTexture = pathToTexture;
 		this.position = position;
+
+		// Add this to the entity list.
+		ClientManager.getInstance().AddEntity(this);
+	}
+
+	/**
+	 * Get rid of this entity.
+	 */
+	public void Destroy() {
+		// Remove the entity from the entity list
+		ClientManager.getInstance().RemoveEntity(this);
 	}
 
 	public short getId() {
