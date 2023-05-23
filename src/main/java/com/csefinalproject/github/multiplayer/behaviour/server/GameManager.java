@@ -1,15 +1,19 @@
 package com.csefinalproject.github.multiplayer.behaviour.server;
 
 import java.util.Map;
+
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 import com.csefinalproject.github.multiplayer.networking.ClientData;
 
 public class GameManager {
 	private static GameManager instance;
+
 	private Map<ClientData, Entity> clientDataEntityMap;
 
 	public GameManager() {
 		instance = this;
+
+		System.out.println("[SERVER] It's me the server!");
 	}
 
 	public static GameManager getInstance() {
