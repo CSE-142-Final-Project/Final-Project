@@ -4,11 +4,12 @@ import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFa
 import com.csefinalproject.github.multiplayer.networking.packet.ConnectionPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.ConnectionSuccessfulPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
+import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.net.*;
 
-public class Client implements IPeer{
+public class Client implements IPeer {
     InetAddress address;
     String ip;
     short port;
@@ -16,28 +17,22 @@ public class Client implements IPeer{
     DatagramSocket socket;
     Ticker clientThread;
 
-
     public void connect(String ip, short port, String username) throws ConnectionFailedException, UnknownHostException {
         if (isConnected) {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
         }
-
         address = InetAddress.getByName(ip);
         this.ip = ip;
         this.port = port;
-
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
-
         tryToConnect(username);
-
         clientThread = new Ticker(IPeer.DEFAULT_TPS);
         clientThread.subscribe(this::clientTick);
         clientThread.start();
-
     }
 
     private void tryToConnect(String username) throws ConnectionFailedException {
@@ -45,7 +40,7 @@ public class Client implements IPeer{
         // Send a packet to the server saying that we want to connect
         this.sendPacket(connectionPacket);
         // This will throw an exception if we don't get a response or the response is not the right packet type
-        waitForAck(socket,ConnectionSuccessfulPacket.class);
+        MessageUtils.waitForAck(socket,ConnectionSuccessfulPacket.class);
         isConnected = true;
     }
 
@@ -55,11 +50,20 @@ public class Client implements IPeer{
 
 
     public void disconnect() {
-
+        if (!isConnected) {
+            throw new IllegalStateException("Can't disconnect if we are not connected");
+        }
+        isConnected = false;
+        
     }
 
     public void sendPacket(Packet packet) {
-
+        if (isConnected) {
+            MessageUtils.sendPacketTo(socket, MessageUtils.encodePacket(packet), address, port);
+        }
+        else {
+            throw new IllegalStateException("Can't send a packet if we are not connected");
+        }
     }
 
     public double lastKeepAlivePacketTime() {
@@ -73,13 +77,11 @@ public class Client implements IPeer{
         return false;
     }
 
+    public String getIp() {
+        return ip;
+    }
 
-
-
-
-
-
+    public short getPort() {
+        return port;
+    }
 }
-
-
-
