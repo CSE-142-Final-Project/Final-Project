@@ -3,6 +3,7 @@ package com.csefinalproject.github.multiplayer.networking.packet;
 import java.io.Serializable;
 
 public class Packet implements Serializable {
+
     public Packet(String ip, short port) {
 
     }

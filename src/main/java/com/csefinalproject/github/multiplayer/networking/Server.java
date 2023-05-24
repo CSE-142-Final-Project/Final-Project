@@ -24,4 +24,14 @@ public class Server implements IPeer {
     public boolean hasNextPacket() {
         return false;
     }
+
+    @Override
+    public short getPort() {
+        return 0;
+    }
+
+    @Override
+    public String getIp() {
+        return null;
+    }
 }
