@@ -5,13 +5,17 @@ import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
 import java.awt.Point;
 
 public class Entity {
+	private static short instances;
 	private short id;
 
-	private String name;
-	private String pathToTexture;
-	private Point position;
+	private final String name;
+	private final String pathToTexture;
+	private final Point position;
 
 	public Entity(String name, String pathToTexture, Point position) {
+		this.id = instances;
+		instances += 1;
+
 		this.name = name;
 		this.pathToTexture = pathToTexture;
 		this.position = position;

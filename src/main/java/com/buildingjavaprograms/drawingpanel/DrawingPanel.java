@@ -1359,6 +1359,14 @@ public final class DrawingPanel implements ImageObserver {
 	public int getZoom() {
 		return currentZoom;
 	}
+
+	/**
+	 * Get the amount of instances of DrawingPanel being run.
+	 * @return An integer with the amount of instances.
+	 */
+	public static int getInstances() {
+		return instances;
+	}
 	
 
 	/**

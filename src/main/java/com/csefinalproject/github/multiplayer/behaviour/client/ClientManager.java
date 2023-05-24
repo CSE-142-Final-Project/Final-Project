@@ -1,8 +1,10 @@
 package com.csefinalproject.github.multiplayer.behaviour.client;
 
+import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientManager {
@@ -15,13 +17,17 @@ public class ClientManager {
 	public ClientManager() {
 		instance = this;
 
+		// Create Entity List
+		System.out.println("[CLIENT] Creating EntityList.");
+		this.entityList = new ArrayList<>();
+
 		// Create ClientRenderer
 		System.out.println("[CLIENT] Creating ClientRenderer.");
-		clientRenderer = new ClientRenderer();
+		this.clientRenderer = new ClientRenderer();
 
 		// Create Input
 		System.out.println("[CLIENT] Creating PanelInput.");
-		panelInput = new PanelInput(clientRenderer.getDrawingPanel());
+		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
 	}
 
 	/**

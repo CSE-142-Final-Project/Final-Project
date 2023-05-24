@@ -1,5 +1,6 @@
 package com.csefinalproject.github.multiplayer;
 
+import org.apache.commons.cli.*;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
 import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
 
@@ -7,20 +8,39 @@ import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
+		// Create command line stuff
+		CommandLine commandLine;
+		CommandLineParser parser = new DefaultParser();
+
+		// Add options
+		Options options = CreateCommandLineOptions();
+
+		// Parse the command line
+		commandLine = parser.parse(options, args);
+
 		// Get if the input from the user.
 		Scanner console = new Scanner(System.in);
-		String programType = GetClientServerResponse(console);
+
+		// Get program type
+		String programType = "";
+		if (commandLine.hasOption("s")) {
+			programType = "server";
+		} else if (commandLine.hasOption("c")) {
+			programType = "client";
+		} else {
+			programType = GetClientServerResponse(console);
+		}
 
 		switch (programType) {
 			case "server" -> {
 				System.out.println("Becoming a Server.");
-				GameManager gameManager = new GameManager();
+				new GameManager();
 			}
 			case "client" -> {
 				System.out.println("Becoming a Client.");
-				ClientManager clientManager = new ClientManager();
+				new ClientManager();
 			}
-			default -> throw new Exception("Invalid Program Type of " + programType + ". Must be a Server or Client.");
+			default -> throw new Exception("Invalid program type of \"" + programType + "\". Must be a Server or Client.");
 		}
 	}
 
@@ -43,5 +63,28 @@ public class Main {
 				System.out.println("Answer must be (S) for Server or (C) for Client.");
 			}
 		}
+	}
+
+	/**
+	 * Create the command line options
+	 * @return Server and Client command line options
+	 */
+	private static Options CreateCommandLineOptions() {
+		Options options = new Options();
+
+		options.addOption(Option.builder("s")
+				.required(false)
+				.desc("Starts a server")
+				.longOpt("server")
+				.build()
+		);
+		options.addOption(Option.builder("c")
+				.required(false)
+				.desc("Starts a client")
+				.longOpt("client")
+				.build()
+		);
+
+		return options;
 	}
 }
