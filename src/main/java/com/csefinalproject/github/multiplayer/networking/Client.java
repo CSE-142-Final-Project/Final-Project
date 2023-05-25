@@ -9,7 +9,6 @@ import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
-import java.io.IOException;
 import java.net.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -18,6 +17,9 @@ public class Client implements IPeer {
     InetAddress address;
     String ip;
     short port;
+
+    short targetPort;
+
     boolean isConnected;
     DatagramSocket socket;
     Ticker clientThread;
@@ -32,7 +34,7 @@ public class Client implements IPeer {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
         }
         address = InetAddress.getByName(ip);
-
+        targetPort = port;
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {
@@ -40,6 +42,8 @@ public class Client implements IPeer {
         }
         this.ip = socket.getInetAddress().toString();
         this.port = (short) socket.getPort();
+
+
         tryToConnect(username);
         clientThread = new Ticker(IPeer.DEFAULT_TPS);
         Thread packetWatcher = new Thread(this::packetWatch);
@@ -63,7 +67,7 @@ public class Client implements IPeer {
         if (!isConnected) {
             clientThread.stop();
         }
-        // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enogu
+        // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
         if (lastKeepAlivePacketSent - System.currentTimeMillis() > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL * 1000) {
             sendPacket(new KeepAlivePacket(this.ip,this.port));
             lastKeepAlivePacketSent = System.currentTimeMillis();
@@ -102,7 +106,7 @@ public class Client implements IPeer {
 
     public void sendPacket(Packet packet) {
         if (isConnected) {
-            MessageUtils.sendPacketTo(socket, MessageUtils.encodePacket(packet), address, port);
+            MessageUtils.sendPacketTo(socket, MessageUtils.encodePacket(packet), address, targetPort);
         }
         else {
             throw new IllegalStateException("Can't send a packet if we are not connected");
