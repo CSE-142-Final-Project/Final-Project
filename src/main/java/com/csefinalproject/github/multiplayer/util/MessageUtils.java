@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.csefinalproject.github.multiplayer.networking.IPeer.*;
@@ -44,7 +45,7 @@ public class MessageUtils {
      * @return the packet we got
      * @throws PacketDecodeError if we cant decode the packet
      */
-    public static Packet waitForPacket(@NotNull DatagramSocket socket) throws PacketDecodeError{
+    public static Packet waitForPacket(@NotNull DatagramSocket socket) throws PacketDecodeError, SocketException {
         return decodePacket(receivePacket(socket));
     }
 
@@ -53,7 +54,7 @@ public class MessageUtils {
      * @param socket socket to listen on
      * @return the packet that was received
      */
-    private static DatagramPacket receivePacket(@NotNull DatagramSocket socket) {
+    private static DatagramPacket receivePacket(@NotNull DatagramSocket socket) throws SocketException {
         byte[] buffer = new byte[DEFAULT_PACKET_SIZE];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         try {
@@ -94,7 +95,7 @@ public class MessageUtils {
             try {
                 result[0] = waitForPacket(socket);
                 successful.set(ack.isInstance(result[0]));
-            } catch (PacketDecodeError e) {
+            } catch (PacketDecodeError | SocketException e) {
                 successful.set(false);
             }
         });
