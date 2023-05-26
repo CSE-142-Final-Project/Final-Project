@@ -7,7 +7,33 @@ import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
 import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
+		CommandLineResponseGetter responseGetter = new CommandLineResponseGetter(args);
+
+		switch (responseGetter.getProgramType()) {
+			case "server" -> {
+				System.out.println("Becoming a Server.");
+				new GameManager(responseGetter.getIp(), responseGetter.getPort());
+			}
+			case "client" -> {
+				System.out.println("Becoming a Client.");
+				new ClientManager();
+			}
+			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either say " +
+					"\"server\" or \"client\".");
+		}
+	}
+}
+
+class CommandLineResponseGetter {
+	private String programType;
+	private String ip;
+	private short port;
+
+	public CommandLineResponseGetter(String[] args) {
+		// Get if the input from the user.
+		Scanner console = new Scanner(System.in);
+
 		// Create command line stuff
 		CommandLine commandLine;
 		CommandLineParser parser = new DefaultParser();
@@ -16,52 +42,85 @@ public class Main {
 		Options options = CreateCommandLineOptions();
 
 		// Parse the command line
-		commandLine = parser.parse(options, args);
-
-		// Get if the input from the user.
-		Scanner console = new Scanner(System.in);
-
-		// Get program type
-		String programType = "";
-		if (commandLine.hasOption("s")) {
-			programType = "server";
-		} else if (commandLine.hasOption("c")) {
-			programType = "client";
-		} else {
-			programType = GetClientServerResponse(console);
+		try {
+			commandLine = parser.parse(options, args);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
 		}
 
-		switch (programType) {
-			case "server" -> {
-				System.out.println("Becoming a Server.");
-				new GameManager();
+		// Get program type
+		if (commandLine.hasOption("s")) {
+			this.programType = "server";
+		} else if (commandLine.hasOption("c")) {
+			this.programType = "client";
+		} else {
+			String response = GetResponse(console,
+					"Do you want to be a (S)erver or a (C)lient? ",
+					"Answer must be (S) for Server or (C) for Client.",
+					new String[] {
+							"s", "server",
+							"c", "client"
+					}
+			);
+
+			if(response.equals("s")) {
+				this.programType = "server";
+			} else if (response.equals("c")) {
+				this.programType = "client";
+			} else {
+				this.programType = response;
 			}
-			case "client" -> {
-				System.out.println("Becoming a Client.");
-				new ClientManager();
-			}
-			default -> throw new Exception("Invalid program type of \"" + programType + "\". Must be a Server or Client.");
+		}
+
+		// Get IP and Port
+		if (commandLine.hasOption("i")) {
+			this.ip = commandLine.getOptionValue("i");
+		} else {
+			String response = GetResponse(console,
+					"Give the IP of the " + programType + " you want to connect to. ",
+					"",
+					new String[] { }
+			);
+
+			this.ip = response;
+		}
+
+		if (commandLine.hasOption("p")) {
+			this.port = Short.parseShort(commandLine.getOptionValue("p"));
+		} else {
+			String response = GetResponse(console,
+					"Give the port of the " + programType + " you want to connect to. ",
+					"",
+					new String[] { }
+			);
+
+			this.port = Short.parseShort(response);
 		}
 	}
 
 	/**
-	 * Uses the Scanner to get if the person running the program wants it to be a server or client.
+	 * Uses the Scanner to get a response from the user.
 	 * @param console The System.in scanner object.
 	 * @return "client" or "server"
 	 */
-	private static String GetClientServerResponse(Scanner console) {
-		// Stuck in permanent loop!
+	private static String GetResponse(Scanner console, String prompt, String errorMessage, String[] correctResponses) {
+		// Might get stuck in permanent loop! Yay!
 		while(true) {
-			System.out.print("Would you like to be the (S)erver or the (C)lient? ");
+			System.out.print(prompt);
 			String response = console.nextLine().trim().toLowerCase();
 
-			if (response.equals("s") || response.equals("server")) {
-				return "server";
-			} else if (response.equals("c") || response.equals("client")) {
-				return "client";
+			// Check if the response is correct
+			if(correctResponses.length == 0) {
+				return response;
 			} else {
-				System.out.println("Answer must be (S) for Server or (C) for Client.");
+				for(int i = 0; i < correctResponses.length; i++) {
+					if(response.equals(correctResponses[i])) {
+						return correctResponses[i];
+					}
+				}
 			}
+
+			System.out.println(errorMessage);
 		}
 	}
 
@@ -71,6 +130,19 @@ public class Main {
 	 */
 	private static Options CreateCommandLineOptions() {
 		Options options = new Options();
+
+		options.addOption(Option.builder("i")
+				.required(false)
+				.desc("IP to connect to.")
+				.longOpt("ip")
+				.build()
+		);
+		options.addOption(Option.builder("p")
+				.required(false)
+				.desc("Port to open on/connect to.")
+				.longOpt("p")
+				.build()
+		);
 
 		options.addOption(Option.builder("s")
 				.required(false)
@@ -86,5 +158,17 @@ public class Main {
 		);
 
 		return options;
+	}
+
+	public String getProgramType() {
+		return programType;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public short getPort() {
+		return port;
 	}
 }
