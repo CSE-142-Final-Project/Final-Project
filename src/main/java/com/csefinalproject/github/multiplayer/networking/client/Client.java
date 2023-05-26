@@ -1,5 +1,6 @@
-package com.csefinalproject.github.multiplayer.networking;
+package com.csefinalproject.github.multiplayer.networking.client;
 
+import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
 import com.csefinalproject.github.multiplayer.networking.packet.ConnectionPacket;
@@ -15,9 +16,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client implements IPeer {
     InetAddress address;
-    String ip;
-    short port;
-
+    String ourIp;
+    short ourPort;
     short targetPort;
 
     boolean isConnected;
@@ -33,18 +33,11 @@ public class Client implements IPeer {
         if (isConnected) {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
         }
-        address = InetAddress.getByName(ip);
-        targetPort = port;
-        try {
-            socket = new DatagramSocket();
-        } catch (SocketException e) {
-            throw new RuntimeException(e);
-        }
-        this.ip = socket.getInetAddress().toString();
-        this.port = (short) socket.getPort();
-
+        setupIpAndPort(ip, port);
 
         tryToConnect(username);
+
+
         clientThread = new Ticker(IPeer.DEFAULT_TPS);
         Thread packetWatcher = new Thread(this::packetWatch);
         clientThread.subscribe(this::clientTick);
@@ -53,8 +46,24 @@ public class Client implements IPeer {
 
     }
 
+    private void setupIpAndPort(String ip, short port) throws UnknownHostException {
+        address = InetAddress.getByName(ip);
+        targetPort = port;
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            this.ourIp = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("We can't resolve the localhost. That is pretty weird",e);// See the comment in Server
+        }
+        this.ourPort = (short) socket.getPort();
+    }
+
     private void tryToConnect(String username) throws ConnectionFailedException {
-        final Packet connectionPacket = new ConnectionPacket(ip, (short) socket.getPort(),username);
+        final Packet connectionPacket = new ConnectionPacket(ourIp, (short) socket.getPort(),username);
         // Send a packet to the server saying that we want to connect
         this.sendPacket(connectionPacket);
         // This will throw an exception if we don't get a response or the response is not the right packet type
@@ -69,7 +78,7 @@ public class Client implements IPeer {
         }
         // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
         if (lastKeepAlivePacketSent - System.currentTimeMillis() > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL * 1000) {
-            sendPacket(new KeepAlivePacket(this.ip,this.port));
+            sendPacket(new KeepAlivePacket(this.ourIp,this.ourPort));
             lastKeepAlivePacketSent = System.currentTimeMillis();
         }
         if (lastKeepAlivePacketTime - System.currentTimeMillis() > (IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) * 1000)
@@ -125,10 +134,10 @@ public class Client implements IPeer {
     }
 
     public String getIp() {
-        return ip;
+        return ourIp;
     }
 
     public short getPort() {
-        return port;
+        return ourPort;
     }
 }
