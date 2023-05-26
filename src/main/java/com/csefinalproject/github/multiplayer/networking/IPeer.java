@@ -27,7 +27,7 @@ public interface IPeer {
     /**
      * @return the current port that THIS peer has opn
      */
-    short getPort();
+    int getPort();
 
     /**
      * @return our ip

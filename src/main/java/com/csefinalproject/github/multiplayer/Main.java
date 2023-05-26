@@ -1,5 +1,6 @@
 package com.csefinalproject.github.multiplayer;
 
+import com.csefinalproject.github.multiplayer.networking.server.Server;
 import org.apache.commons.cli.*;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
 import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
@@ -7,8 +8,8 @@ import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
 import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws Exception {
 
+	public static void main(String[] args) throws Exception {
 		// Create command line stuff
 		CommandLine commandLine;
 		CommandLineParser parser = new DefaultParser();

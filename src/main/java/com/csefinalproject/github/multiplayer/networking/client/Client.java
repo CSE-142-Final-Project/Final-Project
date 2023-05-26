@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Client implements IPeer {
     InetAddress address;
     String ourIp;
-    short ourPort;
-    short targetPort;
+    int ourPort;
+    int targetPort;
 
     boolean isConnected;
     DatagramSocket socket;
@@ -29,7 +29,7 @@ public class Client implements IPeer {
 
     long lastKeepAlivePacketSent = 0L;
 
-    public void connect(String ip, short port, String username) throws ConnectionFailedException, UnknownHostException {
+    public void connect(String ip, int port, String username) throws ConnectionFailedException, UnknownHostException {
         if (isConnected) {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
         }
@@ -43,14 +43,14 @@ public class Client implements IPeer {
         clientThread.subscribe(this::clientTick);
         clientThread.start();
         packetWatcher.start();
-
     }
 
-    private void setupIpAndPort(String ip, short port) throws UnknownHostException {
+    private void setupIpAndPort(String ip, int port) throws UnknownHostException {
         address = InetAddress.getByName(ip);
         targetPort = port;
         try {
             socket = new DatagramSocket();
+            socket.connect(address,targetPort);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -59,17 +59,18 @@ public class Client implements IPeer {
         } catch (UnknownHostException e) {
             throw new RuntimeException("We can't resolve the localhost. That is pretty weird",e);// See the comment in Server
         }
-        this.ourPort = (short) socket.getPort();
+        this.ourPort = socket.getLocalPort();
     }
 
     private void tryToConnect(String username) throws ConnectionFailedException {
-        final Packet connectionPacket = new ConnectionPacket(ourIp, (short) socket.getPort(),username);
+        final Packet connectionPacket = new ConnectionPacket(this,username);
         // Send a packet to the server saying that we want to connect
-        this.sendPacket(connectionPacket);
+        MessageUtils.sendPacketTo(socket, MessageUtils.encodePacket(connectionPacket), address, targetPort);
         // This will throw an exception if we don't get a response or the response is not the right packet type
         MessageUtils.waitForAck(socket,ConnectionSuccessfulPacket.class);
-        isConnected = true;
         lastKeepAlivePacketTime = System.currentTimeMillis();
+        isConnected = true;
+
     }
 
     private void clientTick() {
@@ -78,7 +79,7 @@ public class Client implements IPeer {
         }
         // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
         if (lastKeepAlivePacketSent - System.currentTimeMillis() > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL * 1000) {
-            sendPacket(new KeepAlivePacket(this.ourIp,this.ourPort));
+            sendPacket(new KeepAlivePacket(this));
             lastKeepAlivePacketSent = System.currentTimeMillis();
         }
         if (lastKeepAlivePacketTime - System.currentTimeMillis() > (IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) * 1000)
@@ -137,7 +138,7 @@ public class Client implements IPeer {
         return ourIp;
     }
 
-    public short getPort() {
+    public int getPort() {
         return ourPort;
     }
 }

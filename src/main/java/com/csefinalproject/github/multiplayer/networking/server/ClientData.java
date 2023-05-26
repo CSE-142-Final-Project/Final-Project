@@ -2,12 +2,12 @@ package com.csefinalproject.github.multiplayer.networking.server;
 
 public class ClientData {
 	String ip;
-	short port;
+	int port;
 	String username;
 	short id;
 	static short nextClientId = 0;
 	long lastKeepAliveTime;
-	public ClientData(String ip, short port, String username) {
+	public ClientData(String ip, int port, String username) {
 		this.ip = ip;
 		this.port = port;
 		this.username = username;
@@ -19,7 +19,7 @@ public class ClientData {
 		return ip;
 	}
 
-	public short getPort() {
+	public int getPort() {
 		return port;
 	}
 

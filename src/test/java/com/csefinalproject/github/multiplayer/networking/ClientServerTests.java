@@ -20,7 +20,7 @@ public class ClientServerTests {
         Client client = new Client();
         Server server = new Server();
         server.start((short)7777);
-        client.connect("127.0.0.1",(short)7777,"testing");
+        client.connect("localhost",(short)7777,"testing");
         client.disconnect();
         server.stop();
     }
