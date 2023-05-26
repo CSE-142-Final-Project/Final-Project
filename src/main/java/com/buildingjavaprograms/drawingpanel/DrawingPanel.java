@@ -328,12 +328,12 @@ public final class DrawingPanel implements ImageObserver {
 	/**
 	 * The default width of a com.buildingjavaprograms.drawingpanel.DrawingPanel in pixels, if none is supplied at construction (500 pixels).
 	 */
-	public static final int DEFAULT_WIDTH           = 500;
+	public static final int DEFAULT_WIDTH           = 854;
 	
 	/**
 	 * The default height of a com.buildingjavaprograms.drawingpanel.DrawingPanel in pixels, if none is supplied at construction (400 pixels).
 	 */
-	public static final int DEFAULT_HEIGHT          = 400;
+	public static final int DEFAULT_HEIGHT          = 480;
 	
 	/** An internal constant for setting system properties; clients should not use this. */
 	public static final String ANIMATED_PROPERTY    = "drawingpanel.animated";
