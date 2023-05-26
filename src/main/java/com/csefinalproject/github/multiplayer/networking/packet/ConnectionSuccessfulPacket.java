@@ -1,9 +1,11 @@
 package com.csefinalproject.github.multiplayer.networking.packet;
 
+import com.csefinalproject.github.multiplayer.networking.IPeer;
+
 public class ConnectionSuccessfulPacket extends Packet{
     static final long serialVersionUID = SerialIds.CONNECTION_SUCCESSFUL_PACKET;
-    public ConnectionSuccessfulPacket(String ip, short port) {
-        super(ip, port);
+    public ConnectionSuccessfulPacket(IPeer peer) {
+        super(peer);
     }
 
 }

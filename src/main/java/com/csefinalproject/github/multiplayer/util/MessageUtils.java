@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.csefinalproject.github.multiplayer.networking.IPeer.*;
@@ -19,15 +20,25 @@ public class MessageUtils {
 
     @Contract("_ -> new")
     public static @NotNull DatagramPacket encodePacket(@NotNull Packet packet) {
-        ByteArrayOutputStream buffer =new ByteArrayOutputStream(DEFAULT_PACKET_SIZE);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream(DEFAULT_PACKET_SIZE);
         try {
-            new ObjectOutputStream(buffer).writeObject(packet);
+            ObjectOutputStream stream = new ObjectOutputStream(buffer);
+            stream.writeObject(packet);
+            stream.flush();
+            stream.close();
+            try {
+                Packet packet1 = decodePacket(new DatagramPacket(buffer.toByteArray(), buffer.size()));
+                System.out.println(packet1);
+            }
+            catch (PacketDecodeError e) {
+                System.out.println("Oh no "+e);
+            }
+            return new DatagramPacket(buffer.toByteArray(),buffer.size());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new DatagramPacket(buffer.toByteArray(),buffer.size());
     }
-    public static void sendPacketTo(@NotNull DatagramSocket socket, @NotNull DatagramPacket packet, InetAddress addr, short port) {
+    public static void sendPacketTo(@NotNull DatagramSocket socket, @NotNull DatagramPacket packet, InetAddress addr, int port) {
         packet.setAddress(addr);
         packet.setPort(port);
         try {
@@ -44,7 +55,7 @@ public class MessageUtils {
      * @return the packet we got
      * @throws PacketDecodeError if we cant decode the packet
      */
-    public static Packet waitForPacket(@NotNull DatagramSocket socket) throws PacketDecodeError{
+    public static Packet waitForPacket(@NotNull DatagramSocket socket) throws PacketDecodeError, SocketException {
         return decodePacket(receivePacket(socket));
     }
 
@@ -53,13 +64,16 @@ public class MessageUtils {
      * @param socket socket to listen on
      * @return the packet that was received
      */
-    private static DatagramPacket receivePacket(@NotNull DatagramSocket socket) {
+    private static DatagramPacket receivePacket(@NotNull DatagramSocket socket) throws SocketException {
         byte[] buffer = new byte[DEFAULT_PACKET_SIZE];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(packet);
         }
         catch (IOException e) {
+            if (e instanceof SocketException) {
+                throw (SocketException) e;
+            }
             // We really shouldn't be getting these.
             // I don't want to quit silently so lets exit in a noisy and visible way
             throw new RuntimeException(e);
@@ -75,7 +89,8 @@ public class MessageUtils {
      */
     private static Packet decodePacket(@NotNull DatagramPacket p) throws PacketDecodeError {
         try {
-            Object recievedObject = new ObjectInputStream(new ByteArrayInputStream(p.getData())).readObject();
+            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(p.getData()));
+            Object recievedObject = objectInputStream.readObject();
             if (!(recievedObject instanceof Packet)) {
                 throw new PacketDecodeError("Received something that wasn't a packet");
             }
@@ -94,7 +109,7 @@ public class MessageUtils {
             try {
                 result[0] = waitForPacket(socket);
                 successful.set(ack.isInstance(result[0]));
-            } catch (PacketDecodeError e) {
+            } catch (PacketDecodeError | SocketException e) {
                 successful.set(false);
             }
         });

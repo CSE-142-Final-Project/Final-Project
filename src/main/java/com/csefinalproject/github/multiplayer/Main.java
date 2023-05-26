@@ -1,5 +1,6 @@
 package com.csefinalproject.github.multiplayer;
 
+import com.csefinalproject.github.multiplayer.networking.server.Server;
 import org.apache.commons.cli.*;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
 import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;

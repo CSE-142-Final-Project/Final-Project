@@ -19,9 +19,18 @@ public interface IPeer {
      */
     int DEFAULT_CONNECTION_TIMEOUT = 10;
     int DEFAULT_PACKET_SIZE = 256;
-
+    int DEFAULT_KEEP_ALIVE_INTERVAL = 5;// 5 seconds
+    int DEFAULT_KEEP_ALIVE_GRACE = 5;// 5 seconds of leeway on-top of the interval there supposed to be sent
     Packet getNextPacket();
     boolean hasNextPacket();
-    short getPort();
+
+    /**
+     * @return the current port that THIS peer has opn
+     */
+    int getPort();
+
+    /**
+     * @return our ip
+     */
     String getIp();
 }

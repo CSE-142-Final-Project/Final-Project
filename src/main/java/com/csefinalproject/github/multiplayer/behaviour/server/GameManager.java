@@ -3,9 +3,10 @@ package com.csefinalproject.github.multiplayer.behaviour.server;
 import java.util.Map;
 
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
-import com.csefinalproject.github.multiplayer.networking.ClientData;
+
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
-import com.csefinalproject.github.multiplayer.networking.Server;
+
+import com.csefinalproject.github.multiplayer.networking.server.ClientData;
 
 public class GameManager {
 	private static GameManager instance;
