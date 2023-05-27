@@ -3,6 +3,7 @@ package com.csefinalproject.github.multiplayer.networking.server;
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
 import com.csefinalproject.github.multiplayer.networking.packet.ConnectionPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.ConnectionSuccessfulPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import com.csefinalproject.github.multiplayer.networking.server.ClientData;
 import com.csefinalproject.github.multiplayer.util.MessageUtils;
@@ -19,13 +20,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Server implements IPeer {
 
     DatagramSocket socket;
-    short ourPort;
+    int ourPort;
     String ourIP;
     boolean running;
     Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
     Ticker serverThread;
     HashMap<Short,ClientData> connected = new HashMap<>();
-    public void start(short port) {
+    public void start(int port) {
         if (running) {
             throw new IllegalStateException("Please disconnect the server before attempting to start it again");
         }
@@ -47,7 +48,8 @@ public class Server implements IPeer {
                 if (packet instanceof ConnectionPacket connectionPacket) {
                     ClientData newClient = new ClientData(connectionPacket.getIp(),connectionPacket.getPort(),connectionPacket.getUsername());
                     connected.put(newClient.getClientID(),newClient);
-                    send(packet,newClient.getClientID());
+                    // Yay! they connected
+                    send(new ConnectionSuccessfulPacket(this),newClient.getClientID());
                 }
             } catch (PacketDecodeError e) {
                 throw new RuntimeException(e);
@@ -62,7 +64,7 @@ public class Server implements IPeer {
 
     }
 
-    private void setupIpAndPort(short port) {
+    private void setupIpAndPort(int port) {
         ourPort = port;
         try {
             socket = new DatagramSocket(port);
@@ -92,7 +94,7 @@ public class Server implements IPeer {
 
     private void sendMessageToClient(Packet packet, @NotNull ClientData data) {
         try {
-            MessageUtils.sendPacketTo(socket,MessageUtils.encodePacket(packet),InetAddress.getByName(data.getIP()), data.getPort());
+            MessageUtils.sendPacketTo(socket,packet,InetAddress.getByName(data.getIP()), data.getPort());
         } catch (UnknownHostException e) {
             // This is impossible and will never happen unless someone does weird reflection
             throw new RuntimeException(e);

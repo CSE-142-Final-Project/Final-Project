@@ -50,7 +50,7 @@ public class Client implements IPeer {
         targetPort = port;
         try {
             socket = new DatagramSocket();
-            socket.connect(address,targetPort);
+
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -65,9 +65,7 @@ public class Client implements IPeer {
     private void tryToConnect(String username) throws ConnectionFailedException {
         final Packet connectionPacket = new ConnectionPacket(this,username);
         // Send a packet to the server saying that we want to connect
-        MessageUtils.sendPacketTo(socket, MessageUtils.encodePacket(connectionPacket), address, targetPort);
-        // This will throw an exception if we don't get a response or the response is not the right packet type
-        MessageUtils.waitForAck(socket,ConnectionSuccessfulPacket.class);
+        MessageUtils.sendMessageWaitingForAck(socket,connectionPacket, address, targetPort, ConnectionSuccessfulPacket.class);
         lastKeepAlivePacketTime = System.currentTimeMillis();
         isConnected = true;
 
@@ -116,7 +114,7 @@ public class Client implements IPeer {
 
     public void sendPacket(Packet packet) {
         if (isConnected) {
-            MessageUtils.sendPacketTo(socket, MessageUtils.encodePacket(packet), address, targetPort);
+            MessageUtils.sendPacketTo(socket, packet, address, targetPort);
         }
         else {
             throw new IllegalStateException("Can't send a packet if we are not connected");

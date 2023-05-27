@@ -1,6 +1,7 @@
 package com.csefinalproject.github.multiplayer.util;
 
 import com.csefinalproject.github.multiplayer.networking.IPeer;
+import com.csefinalproject.github.multiplayer.networking.exceptions.BadCallbackResponseException;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
@@ -20,25 +21,27 @@ public class MessageUtils {
 
     @Contract("_ -> new")
     public static @NotNull DatagramPacket encodePacket(@NotNull Packet packet) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream(DEFAULT_PACKET_SIZE);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
             ObjectOutputStream stream = new ObjectOutputStream(buffer);
             stream.writeObject(packet);
             stream.flush();
-            stream.close();
-            try {
-                Packet packet1 = decodePacket(new DatagramPacket(buffer.toByteArray(), buffer.size()));
-                System.out.println(packet1);
-            }
-            catch (PacketDecodeError e) {
-                System.out.println("Oh no "+e);
+            if (buffer.size() > DEFAULT_PACKET_SIZE) {
+                throw new IllegalArgumentException("The passed packet was to big, Either make it smaller or increase the default max");
             }
             return new DatagramPacket(buffer.toByteArray(),buffer.size());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                buffer.close();
+            } catch (IOException e) {
+                // Ignore this
+            }
         }
     }
-    public static void sendPacketTo(@NotNull DatagramSocket socket, @NotNull DatagramPacket packet, InetAddress addr, int port) {
+    public static void sendPacketTo(@NotNull DatagramSocket socket, @NotNull Packet packetToSend, InetAddress addr, int port) {
+        DatagramPacket packet = encodePacket(packetToSend);
         packet.setAddress(addr);
         packet.setPort(port);
         try {
@@ -99,22 +102,39 @@ public class MessageUtils {
             throw new PacketDecodeError(e);
         }
     }
-    public static Packet waitForAck(@NotNull DatagramSocket socket, Class<? extends Packet> ack) throws ConnectionFailedException {
+
+    /**
+     * I will fill out the rest later
+     * Throws an error if the FIRST packet recieved was not of the specified type
+     * @param socket
+     * @param toSend
+     * @param address
+     * @param port
+     * @param ack
+     * @return
+     * @throws ConnectionFailedException
+     */
+    public static Packet sendMessageWaitingForAck(@NotNull DatagramSocket socket,Packet toSend,InetAddress address, int port, Class<? extends Packet> ack) throws ConnectionFailedException {
         // Have we succeeded yet
         AtomicBoolean successful = new AtomicBoolean(false);
+        AtomicBoolean failed = new AtomicBoolean(false);
+
         // Threadsafe way to do all of this
         final Packet[] result = new Packet[1];
         // wait for the callback
         Thread waitingThread = new Thread(()->{
             try {
                 result[0] = waitForPacket(socket);
-                successful.set(ack.isInstance(result[0]));
+                successful.set(true);// We got something
             } catch (PacketDecodeError | SocketException e) {
                 successful.set(false);
             }
         });
 
         waitingThread.start();
+
+        sendPacketTo(socket,toSend,address,port);
+
         long startTime = System.currentTimeMillis();
         while (!successful.get()) {
             long elapsedTime = System.currentTimeMillis() - startTime;
@@ -123,7 +143,11 @@ public class MessageUtils {
                 throw new ConnectionFailedException("Connection Failed, Timed out");
             }
         }
-        return result[0];
+        if (ack.isInstance(result[0])) {
+            return result[0];
+        } else {
+            throw new BadCallbackResponseException("Recieved a packet of the type "+result[0].getClass() +" but expected "+ack);
+        }
     }
 
 }

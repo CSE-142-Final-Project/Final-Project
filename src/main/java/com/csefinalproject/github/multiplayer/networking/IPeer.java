@@ -18,7 +18,7 @@ public interface IPeer {
      * Time in seconds that a peer waits for a response from the other peer
      */
     int DEFAULT_CONNECTION_TIMEOUT = 10;
-    int DEFAULT_PACKET_SIZE = 256;
+    int DEFAULT_PACKET_SIZE = 512;
     int DEFAULT_KEEP_ALIVE_INTERVAL = 5;// 5 seconds
     int DEFAULT_KEEP_ALIVE_GRACE = 5;// 5 seconds of leeway on-top of the interval there supposed to be sent
     Packet getNextPacket();
