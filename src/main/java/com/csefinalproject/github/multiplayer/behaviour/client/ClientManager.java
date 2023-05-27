@@ -1,10 +1,7 @@
 package com.csefinalproject.github.multiplayer.behaviour.client;
 
-import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
-import com.csefinalproject.github.multiplayer.networking.Client;
-import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 
 import java.util.ArrayList;
 import java.util.List;
