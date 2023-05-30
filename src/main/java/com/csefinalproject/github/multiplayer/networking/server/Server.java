@@ -74,7 +74,8 @@ public class Server implements IPeer {
         // iterate through the connected clients
         long currentTime = System.currentTimeMillis();
 
-        for (ClientData data : connected.values()) {
+        Collection<ClientData> clientValues = connected.values();
+        for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
                 // They are disconnected
                 connected.remove(data.getClientID());
