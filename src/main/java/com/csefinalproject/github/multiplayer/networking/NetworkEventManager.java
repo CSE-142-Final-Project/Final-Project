@@ -35,6 +35,7 @@ public class NetworkEventManager {
         }
         Thread restartWatcher = new Thread(this::waitForRestart);
         restartWatcher.setDaemon(true);
+        restartWatcher.start();
     }
 
     private void waitForRestart() {
