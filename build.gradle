@@ -47,7 +47,7 @@ application {
 jar {
     manifest {
         attributes(
-                'classpath' : sourceSets.main,
+                'Class-Path' : sourceSets.main,
                 'Main-Class': 'com.csefinalproject.github.multiplayer.Main'
         )
     }
