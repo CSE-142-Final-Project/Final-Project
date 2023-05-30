@@ -26,7 +26,7 @@ public class MessageUtils {
             ObjectOutputStream stream = new ObjectOutputStream(buffer);
             stream.writeObject(packet);
             stream.flush();
-            if (buffer.size() > DEFAULT_PACKET_SIZE) {
+            if (buffer.size() > IPeer.DEFAULT_PACKET_SIZE) {
                 throw new IllegalArgumentException("The passed packet was to big, Either make it smaller or increase the default max");
             }
             return new DatagramPacket(buffer.toByteArray(),buffer.size());
@@ -68,7 +68,7 @@ public class MessageUtils {
      * @return the packet that was received
      */
     private static DatagramPacket receivePacket(@NotNull DatagramSocket socket) throws SocketException {
-        byte[] buffer = new byte[DEFAULT_PACKET_SIZE];
+        byte[] buffer = new byte[IPeer.DEFAULT_PACKET_SIZE];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(packet);

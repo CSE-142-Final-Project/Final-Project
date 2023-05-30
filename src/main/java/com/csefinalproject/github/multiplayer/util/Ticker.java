@@ -22,19 +22,22 @@ public class Ticker {
     }
 
     public void start() {
-        if (_running == false)
+        if (!_running)
         {
             _running = true;
             threadToRun = new Thread(() -> {
-                try
+                while (_running)
                 {
-                    Thread.sleep(timeBetweenTicks);
-                    for (Runnable toRun : subscribed) {
-                        toRun.run();
+                   try
+                    {
+                        Thread.sleep(timeBetweenTicks);
+                        for (Runnable toRun : subscribed) {
+                            toRun.run();
+                        }
                     }
-                }
-                catch(InterruptedException e) {
-                    throw new RuntimeException(e);
+                    catch(InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
             threadToRun.start();
@@ -45,7 +48,7 @@ public class Ticker {
         }
     }
     public void stop() {
-        if (_running == true)
+        if (_running)
         {
             _running = false;
             threadToRun = null;
@@ -54,5 +57,9 @@ public class Ticker {
         {
             throw new IllegalStateException("You cannot stop a ticker that is already stopped");
         }
+    }
+
+    public boolean isRunning() {
+        return _running;
     }
 }

@@ -15,19 +15,19 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client implements IPeer {
-    InetAddress address;
-    String ourIp;
-    int ourPort;
-    int targetPort;
+    private InetAddress address;
+    private String ourIp;
+    private int ourPort;
+    private int targetPort;
 
-    boolean isConnected;
-    DatagramSocket socket;
-    Ticker clientThread;
-    Queue<Packet> packetsReceived = new ConcurrentLinkedQueue<>();
+    private boolean isConnected;
+    private DatagramSocket socket;
+    private Ticker clientThread;
+    private final Queue<Packet> packetsReceived = new ConcurrentLinkedQueue<>();
 
-    long lastKeepAlivePacketTime = 0L;
+    private long lastKeepAlivePacketTime = 0L;
 
-    long lastKeepAlivePacketSent = 0L;
+    private long lastKeepAlivePacketSent = 0L;
 
     public void connect(String ip, int port, String username) throws ConnectionFailedException, UnknownHostException {
         if (isConnected) {
@@ -72,15 +72,18 @@ public class Client implements IPeer {
     }
 
     private void clientTick() {
-        if (!isConnected) {
+        if (!isConnected && clientThread.isRunning()) {
             clientThread.stop();
+            return;
         }
         // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
-        if (lastKeepAlivePacketSent - System.currentTimeMillis() > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL * 1000) {
+        long currentTime = System.currentTimeMillis();
+
+        if ((currentTime - lastKeepAlivePacketSent ) / 1000L > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL) {
             sendPacket(new KeepAlivePacket(this));
-            lastKeepAlivePacketSent = System.currentTimeMillis();
+            lastKeepAlivePacketSent = currentTime;
         }
-        if (lastKeepAlivePacketTime - System.currentTimeMillis() > (IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) * 1000)
+        if ((currentTime - lastKeepAlivePacketTime ) / 1000L > (IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE))
         {
             disconnect();
         }
@@ -125,18 +128,25 @@ public class Client implements IPeer {
         return (lastKeepAlivePacketTime - System.currentTimeMillis()) / 1000.0;
     }
 
-    public Packet getNextPacket() {
+    @Override
+    public synchronized Packet getNextPacket() {
         return packetsReceived.poll();
     }
-    public boolean hasNextPacket() {
+    @Override
+    public synchronized boolean hasNextPacket() {
         return !packetsReceived.isEmpty();
     }
-
+    @Override
     public String getIp() {
         return ourIp;
     }
-
+    @Override
     public int getPort() {
         return ourPort;
+    }
+    @Override
+
+    public boolean isActive() {
+        return isConnected;
     }
 }

@@ -31,4 +31,5 @@ public class TickerTests {
         ticker.stop();
         Assertions.assertThrows(IllegalStateException.class,ticker::stop);
     }
+
 }

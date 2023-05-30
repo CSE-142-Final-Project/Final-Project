@@ -1,16 +1,6 @@
 package com.csefinalproject.github.multiplayer.networking;
 
-import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
-import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface IPeer {
     int DEFAULT_TPS = 20;
@@ -21,6 +11,7 @@ public interface IPeer {
     int DEFAULT_PACKET_SIZE = 512;
     int DEFAULT_KEEP_ALIVE_INTERVAL = 5;// 5 seconds
     int DEFAULT_KEEP_ALIVE_GRACE = 5;// 5 seconds of leeway on-top of the interval there supposed to be sent
+
     Packet getNextPacket();
     boolean hasNextPacket();
 
@@ -33,4 +24,8 @@ public interface IPeer {
      * @return our ip
      */
     String getIp();
+    /**
+     * @return weather or not we are actively listening for packets
+     */
+    boolean isActive();
 }

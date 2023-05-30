@@ -11,12 +11,26 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main.java.srcDir "src/main/java"
+    main.resources.srcDir "src/main/resources"
+    test.java.srcDir "src/test/java"
+    test.resources.srcDir "src/test/resources"
+    sample.java.srcDir "src/sample/java"
+    sample.resources.srcDir "src/sample/java"
+}
+
 dependencies {
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
     implementation 'org.jetbrains:annotations:20.1.0'
+
+
 	testImplementation'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'junit:junit:4.13.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:1.7.0'
+
+
+    sampleImplementation sourceSets.main.output
 }
 
 test {
@@ -27,17 +41,12 @@ application {
     mainClass = 'com.csefinalproject.github.multiplayer.Main'
 }
 
-sourceSets {
-    main.java.srcDir "src/main/java"
-    main.resources.srcDir "src/main/resources"
-	test.java.srcDir "src/test/java"
-	test.resources.srcDir "src/test/resources"
-}
+
+
 
 jar {
   manifest {
     attributes(
-      'Class-Path': sourceSets.main,
       'Main-Class': 'com.csefinalproject.github.multiplayer.Main'
     )
   }

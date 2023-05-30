@@ -4,8 +4,8 @@ import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
 import com.csefinalproject.github.multiplayer.networking.packet.ConnectionPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.ConnectionSuccessfulPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.KeepAlivePacket;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
-import com.csefinalproject.github.multiplayer.networking.server.ClientData;
 import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +19,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Server implements IPeer {
 
-    DatagramSocket socket;
-    int ourPort;
-    String ourIP;
-    boolean running;
-    Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
-    Ticker serverThread;
-    HashMap<Short,ClientData> connected = new HashMap<>();
+    private DatagramSocket socket;
+    private int ourPort;
+    private String ourIP;
+    private boolean running;
+    private final Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
+    private Ticker serverThread;
+    private final HashMap<Short,ClientData> connected = new HashMap<>();
     public void start(int port) {
         if (running) {
             throw new IllegalStateException("Please disconnect the server before attempting to start it again");
@@ -50,6 +50,12 @@ public class Server implements IPeer {
                     connected.put(newClient.getClientID(),newClient);
                     // Yay! they connected
                     send(new ConnectionSuccessfulPacket(this),newClient.getClientID());
+                } else if (packet instanceof KeepAlivePacket keepAlivePacket) {// Note that we got a keep alive packet and send one back
+                    ClientData sender = ClientData.getFromIpAndPort(keepAlivePacket.getIp(),keepAlivePacket.getPort());
+                    connected.get(sender.getClientID()).setLastReceivedPacketTime(System.currentTimeMillis());
+                    send(new KeepAlivePacket(this),sender.getClientID());
+                } else {
+                    packetsToBeProcessed.add(packet);
                 }
             } catch (PacketDecodeError e) {
                 throw new RuntimeException(e);
@@ -61,7 +67,20 @@ public class Server implements IPeer {
     }
 
     private void serverTick() {
+        if (!running && serverThread.isRunning())
+        {
+            serverThread.stop();
+        }
+        // iterate through the connected clients
+        long currentTime = System.currentTimeMillis();
 
+        for (ClientData data : connected.values()) {
+            if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
+                // They are disconnected
+                connected.remove(data.getClientID());
+            }
+
+        }
     }
 
     private void setupIpAndPort(int port) {
@@ -80,7 +99,11 @@ public class Server implements IPeer {
     }
 
     public void stop() {
+        if (!running) {
+            throw new IllegalStateException("You can't stop a server that isn't running");
+        }
         running = false;
+        serverThread.stop();
         socket.close();
     }
     public void send(Packet packet, short client) {
@@ -101,13 +124,18 @@ public class Server implements IPeer {
         }
     }
 
+    public ClientData getUserFromPacket(Packet packet) {
+        return ClientData.getFromIpAndPort(packet.getIp(),packet.getPort());
+    }
+
+
     public ClientData[] getClientData() {
         return connected.values().toArray(new ClientData[0]);
     }
-    public Packet getNextPacket() {
+    public synchronized Packet getNextPacket() {
         return packetsToBeProcessed.poll();
     }
-    public boolean hasNextPacket() {
+    public synchronized boolean hasNextPacket() {
         return !packetsToBeProcessed.isEmpty();
     }
 
@@ -119,5 +147,9 @@ public class Server implements IPeer {
     @Override
     public String getIp() {
         return ourIP;
+    }
+    @Override
+    public boolean isActive() {
+        return running;
     }
 }
