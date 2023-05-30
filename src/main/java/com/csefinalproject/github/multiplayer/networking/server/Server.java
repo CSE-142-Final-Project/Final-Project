@@ -111,7 +111,8 @@ public class Server implements IPeer {
         sendMessageToClient(packet,connected.get(client));
     }
     public void broadcast(Packet packet) {
-        for (ClientData data : connected.values()) {
+        Collection<ClientData> clientValues = connected.values();
+        for (ClientData data : clientValues) {
             sendMessageToClient(packet,data);
         }
     }
