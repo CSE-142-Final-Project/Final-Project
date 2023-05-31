@@ -5,17 +5,26 @@ import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class NetworkEventManager {
     private final HashMap<Class<? extends Packet>, List<Consumer<Packet>>> subscribedEvents;
     private Thread eventMonitor;
     private final IPeer peerToWatch;
+    private ArrayList<Thread.UncaughtExceptionHandler> handlers;
+    Thread.UncaughtExceptionHandler handle;
     public NetworkEventManager(IPeer peer) {
         subscribedEvents = new HashMap<>();
         peerToWatch = peer;
         eventMonitor = new Thread(this::watchForPackets);
         eventMonitor.start();
+        handle = (t, e) -> {
+            for (Thread.UncaughtExceptionHandler handler : handlers) {
+                handler.uncaughtException(t, e);
+            }
+        };
+        handlers = new ArrayList<>();
     }
     private void watchForPackets() {
         while (peerToWatch.isActive()) {
@@ -29,7 +38,9 @@ public class NetworkEventManager {
             if (subscribedEvents.containsKey(packetClass)) {
                 for (Consumer<Packet> event : subscribedEvents.get(packetClass)) {
                     Thread thread = new Thread(() -> event.accept(packet));
+                    thread.setUncaughtExceptionHandler(handle);
                     thread.start();
+
                 }
             }
         }
@@ -58,5 +69,8 @@ public class NetworkEventManager {
             subscribedEvents.put(packetType, new ArrayList<>());
         }
         subscribedEvents.get(packetType).add((Consumer<Packet>) onPacket);
+    }
+    public void subscribeHandler(Thread.UncaughtExceptionHandler handle) {
+        handlers.add(handle);
     }
 }

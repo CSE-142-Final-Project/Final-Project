@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -91,6 +92,35 @@ public class ClientServerTests {
             throw new RuntimeException(e);
         }
         assertEquals(0, server.getClientData().length, "The server should disconnect hanging clients");
+    }
+    @Test
+    public void testServerDoesntBreakAfterManyConnections() {
+        AtomicInteger timesFailed = new AtomicInteger();
+        server = new Server();
+        server.start(7777);
+        NetworkEventManager eventManager = new NetworkEventManager(server);
+        eventManager.subscribeEvent(SuperPacket.class,(SuperPacket p) -> {
+            server.broadcast(new SuperPacket(server));
+        });
+        eventManager.subscribeHandler((Thread thread, Throwable e) -> {
+            timesFailed.incrementAndGet();
+        });
+        for (int i = 0; i < 20; i++) {// This number may seriously impact the trout population
+            client = new Client();
+            try {
+                client.connect("127.0.0.1",7777,"Client "+i);
+                client.sendPacket(new SuperPacket(client));
+            } catch (ConnectionFailedException | UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+            client.disconnect();
+        }
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(0,timesFailed.get(),"We should fail zero times");
     }
 
     @AfterEach
