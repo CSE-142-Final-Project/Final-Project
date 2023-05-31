@@ -1,40 +1,40 @@
 package com.csefinalproject.github.multiplayer;
 
+import com.csefinalproject.github.multiplayer.util.ProgramType;
 import org.apache.commons.cli.*;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
 import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) {
-		CommandLineResponseGetter responseGetter = new CommandLineResponseGetter(args);
+		// Get if the input from the user.
+		Scanner console = new Scanner(System.in);
+
+		CommandLineResponseGetter responseGetter = new CommandLineResponseGetter(args, console);
 
 		switch (responseGetter.getProgramType()) {
-			case "server" -> {
+			case SERVER -> {
 				System.out.println("Becoming a Server.");
 				new GameManager(responseGetter.getIp(), responseGetter.getPort());
 			}
-			case "client" -> {
+			case CLIENT -> {
 				System.out.println("Becoming a Client.");
 				new ClientManager();
 			}
-			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either say " +
+			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either be " +
 					"\"server\" or \"client\".");
 		}
 	}
 }
 
 class CommandLineResponseGetter {
-	private String programType;
+	private ProgramType programType;
 	private String ip;
 	private short port;
 
-	public CommandLineResponseGetter(String[] args) {
-		// Get if the input from the user.
-		Scanner console = new Scanner(System.in);
-
+	public CommandLineResponseGetter(String[] args, Scanner console) {
 		// Create command line stuff
 		CommandLine commandLine;
 		CommandLineParser parser = new DefaultParser();
@@ -49,7 +49,95 @@ class CommandLineResponseGetter {
 			throw new RuntimeException(e);
 		}
 
-		System.out.println();
+		// Get server/client
+		if (commandLine.hasOption("s")) {
+			this.programType = ProgramType.SERVER;
+		} else if (commandLine.hasOption("c")) {
+			this.programType = ProgramType.CLIENT;
+		} else {
+			this.programType = AskToBecomeServerOrClient(console);
+		}
+
+		// Get IP
+		if (commandLine.hasOption("ip")) {
+			this.ip = commandLine.getOptionValue("ip");
+		} else if (this.programType == ProgramType.CLIENT) {
+			this.ip = AskForIP(console);
+		}
+
+		// Get port
+		if (commandLine.hasOption("p")) {
+			try {
+				this.port = Short.parseShort(commandLine.getOptionValue("p"));
+			} catch (NumberFormatException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			this.port = AskForPort(console);
+		}
+	}
+
+	/**
+	 * Asks the person in the console if they want to be a server or client and then returns the program type.
+	 * @param console The System.in Scanner
+	 * @return The program type, a server or client
+	 */
+	private ProgramType AskToBecomeServerOrClient(Scanner console) {
+		String response = GetResponse(console,
+				"Do you want to be a (S)erver or a (C)lient? ",
+				"Answer must be (S) for Server or (C) for Client.",
+				new String[] {
+						"s", "server",
+						"c", "client"
+				}
+		);
+
+		if (response.equals("s") || response.equals("server")) {
+			return ProgramType.SERVER;
+		} else if (response.equals("c") || response.equals("client")) {
+			return ProgramType.CLIENT;
+		} else {
+			throw new IllegalArgumentException("GetResponse is supposed to return a \"server\" or \"client\" here! AAAAAA");
+		}
+	}
+
+	/**
+	 * Ask for the IP that the client wants to connect to.
+	 * @param console The System.in Scanner
+	 * @return A string with the IP of the server
+	 */
+	private String AskForIP(Scanner console) {
+		return GetResponse(console,
+				"Give the IP of the server you want to connect to. ",
+				"",
+				new String[] { }
+		);
+	}
+
+	/**
+	 * Ask for the port of the server
+	 * @param console The System.in Scanner
+	 * @return A short with the port of the server.
+	 */
+	private short AskForPort(Scanner console) {
+		String prompt;
+		switch(this.programType) {
+			case CLIENT -> prompt = "Give the port of the server you want to connect to. ";
+			case SERVER -> prompt = "Give the port you want to open the server on. ";
+			default -> throw new IllegalStateException("Unexpected value: " + this.programType);
+		}
+
+		String response = GetResponse(console,
+				prompt,
+				"",
+				new String[] { }
+		);
+
+		try {
+			return Short.parseShort(response);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -67,9 +155,9 @@ class CommandLineResponseGetter {
 			if(correctResponses.length == 0) {
 				return response;
 			} else {
-				for(int i = 0; i < correctResponses.length; i++) {
-					if(response.equals(correctResponses[i])) {
-						return correctResponses[i];
+				for (String correctResponse : correctResponses) {
+					if (response.equals(correctResponse)) {
+						return correctResponse;
 					}
 				}
 			}
@@ -87,10 +175,12 @@ class CommandLineResponseGetter {
 
 		options.addOption(Option.builder("ip")
 				.required(false)
+				.hasArg()
 				.desc("IP to connect to.")
 				.build()
 		).addOption(Option.builder("p")
 				.required(false)
+				.hasArg()
 				.desc("Port to open on/connect to.")
 				.longOpt("p")
 				.build()
@@ -104,12 +194,12 @@ class CommandLineResponseGetter {
 				.desc("Starts a client")
 				.longOpt("client")
 				.build()
-		);;
+		);
 
 		return options;
 	}
 
-	public String getProgramType() {
+	public ProgramType getProgramType() {
 		return programType;
 	}
 
@@ -121,3 +211,4 @@ class CommandLineResponseGetter {
 		return port;
 	}
 }
+
