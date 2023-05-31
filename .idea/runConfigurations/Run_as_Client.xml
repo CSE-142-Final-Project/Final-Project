@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run as Client" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.csefinalproject.github.multiplayer.Main" />
+    <module name="Multiplayer-Thing.main" />
+    <option name="PROGRAM_PARAMETERS" value="-c -ip 127.0.0.1 -p 7777" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.csefinalproject.github.multiplayer.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
