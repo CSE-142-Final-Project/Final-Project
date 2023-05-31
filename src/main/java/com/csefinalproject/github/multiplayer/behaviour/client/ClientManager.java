@@ -2,19 +2,27 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
+import com.csefinalproject.github.multiplayer.networking.client.Client;
+import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClientManager {
 	private static ClientManager instance;
 
-	private PanelInput panelInput;
+	private Client client;
 	private ClientRenderer clientRenderer;
+	private PanelInput panelInput;
 	private List<Entity> entityList;
 
-	public ClientManager() {
+	public ClientManager(String ip, short port) {
 		instance = this;
+
+		// Create Client
+		System.out.println("[CLIENT] Creating Client.");
+		this.client = new Client();
 
 		// Create Entity List
 		System.out.println("[CLIENT] Creating EntityList.");
@@ -27,6 +35,14 @@ public class ClientManager {
 		// Create Input
 		System.out.println("[CLIENT] Creating PanelInput.");
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
+
+		// Try to connect
+		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port);
+		try {
+			this.client.connect(ip, port, "Epicly Client");
+		} catch (ConnectionFailedException | UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -47,6 +63,10 @@ public class ClientManager {
 
 	public static ClientManager getInstance() {
 		return instance;
+	}
+
+	public Client getClient() {
+		return client;
 	}
 
 	public ClientRenderer getClientRenderer() {

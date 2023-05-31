@@ -21,7 +21,7 @@ public class Main {
 			}
 			case CLIENT -> {
 				System.out.println("Becoming a Client.");
-				new ClientManager();
+				new ClientManager(responseGetter.getIp(), responseGetter.getPort());
 			}
 			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either be " +
 					"\"server\" or \"client\".");
@@ -182,7 +182,7 @@ class CommandLineResponseGetter {
 				.required(false)
 				.hasArg()
 				.desc("Port to open on/connect to.")
-				.longOpt("p")
+				.longOpt("port")
 				.build()
 		).addOption(Option.builder("s")
 				.required(false)
