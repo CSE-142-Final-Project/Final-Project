@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Server implements IPeer {
@@ -25,7 +26,11 @@ public class Server implements IPeer {
     private boolean running;
     private final Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
     private Ticker serverThread;
-    private final HashMap<Short,ClientData> connected = new HashMap<>();
+    private final ConcurrentHashMap<Short,ClientData> connected = new ConcurrentHashMap<>();
+
+    Thread packetWatcher;
+    private Thread.UncaughtExceptionHandler handle;
+
     public void start(int port) {
         if (running) {
             throw new IllegalStateException("Please disconnect the server before attempting to start it again");
@@ -35,7 +40,7 @@ public class Server implements IPeer {
 
         running = true;
         serverThread = new Ticker(IPeer.DEFAULT_TPS);
-        Thread packetWatcher = new Thread(this::packetWatch);
+        packetWatcher = new Thread(this::packetWatch);
         serverThread.subscribe(this::serverTick);
         serverThread.start();
         packetWatcher.start();
@@ -80,7 +85,6 @@ public class Server implements IPeer {
                 // They are disconnected
                 connected.remove(data.getClientID());
             }
-
         }
     }
 
@@ -134,6 +138,8 @@ public class Server implements IPeer {
     public ClientData[] getClientData() {
         return connected.values().toArray(new ClientData[0]);
     }
+
+
     public synchronized Packet getNextPacket() {
         return packetsToBeProcessed.poll();
     }
