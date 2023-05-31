@@ -12,6 +12,9 @@ public interface IPeer {
     int DEFAULT_KEEP_ALIVE_INTERVAL = 5;// 5 seconds
     int DEFAULT_KEEP_ALIVE_GRACE = 5;// 5 seconds of leeway on-top of the interval there supposed to be sent
 
+
+    void addExceptionHandle(Thread.UncaughtExceptionHandler handle);
+
     Packet getNextPacket();
     boolean hasNextPacket();
 

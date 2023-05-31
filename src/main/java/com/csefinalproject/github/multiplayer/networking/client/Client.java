@@ -29,6 +29,9 @@ public class Client implements IPeer {
 
     private long lastKeepAlivePacketSent = 0L;
 
+    Thread packetWatcher;
+    Thread.UncaughtExceptionHandler handle;
+
     public void connect(String ip, int port, String username) throws ConnectionFailedException, UnknownHostException {
         if (isConnected) {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
@@ -39,7 +42,7 @@ public class Client implements IPeer {
 
 
         clientThread = new Ticker(IPeer.DEFAULT_TPS);
-        Thread packetWatcher = new Thread(this::packetWatch);
+        packetWatcher = new Thread(this::packetWatch);
         clientThread.subscribe(this::clientTick);
         clientThread.start();
         packetWatcher.start();
@@ -126,6 +129,12 @@ public class Client implements IPeer {
 
     public double lastKeepAlivePacketTime() {
         return (lastKeepAlivePacketTime - System.currentTimeMillis()) / 1000.0;
+    }
+
+    @Override
+    public void addExceptionHandle(Thread.UncaughtExceptionHandler handle) {
+        this.handle = handle;
+        packetWatcher.setUncaughtExceptionHandler(handle);
     }
 
     @Override

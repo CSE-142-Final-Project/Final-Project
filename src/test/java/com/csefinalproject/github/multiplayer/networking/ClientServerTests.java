@@ -92,6 +92,31 @@ public class ClientServerTests {
         }
         assertEquals(0, server.getClientData().length, "The server should disconnect hanging clients");
     }
+    @Test
+    public void testServerDoesntBreakAfterManyConnections() {
+        server = new Server();
+        server.start(7777);
+        NetworkEventManager eventManager = new NetworkEventManager(server);
+        eventManager.subscribeEvent(SuperPacket.class,(SuperPacket p) -> {
+            System.out.println(server.getUserFromPacket(p));
+            server.broadcast(new SuperPacket(server));
+        });
+        for (int i = 0; i < 20; i++) {
+            client = new Client();
+            try {
+                client.connect("127.0.0.1",7777,"Client "+i);
+                client.sendPacket(new SuperPacket(client));
+            } catch (ConnectionFailedException | UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+            client.disconnect();
+        }
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @AfterEach
     public void stopServerAndClient() {

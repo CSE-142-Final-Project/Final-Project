@@ -26,6 +26,10 @@ public class Server implements IPeer {
     private final Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
     private Ticker serverThread;
     private final HashMap<Short,ClientData> connected = new HashMap<>();
+
+    Thread packetWatcher;
+    private Thread.UncaughtExceptionHandler handle;
+
     public void start(int port) {
         if (running) {
             throw new IllegalStateException("Please disconnect the server before attempting to start it again");
@@ -35,7 +39,7 @@ public class Server implements IPeer {
 
         running = true;
         serverThread = new Ticker(IPeer.DEFAULT_TPS);
-        Thread packetWatcher = new Thread(this::packetWatch);
+        packetWatcher = new Thread(this::packetWatch);
         serverThread.subscribe(this::serverTick);
         serverThread.start();
         packetWatcher.start();
@@ -80,7 +84,6 @@ public class Server implements IPeer {
                 // They are disconnected
                 connected.remove(data.getClientID());
             }
-
         }
     }
 
@@ -133,6 +136,13 @@ public class Server implements IPeer {
     public ClientData[] getClientData() {
         return connected.values().toArray(new ClientData[0]);
     }
+
+    @Override
+    public void addExceptionHandle(Thread.UncaughtExceptionHandler handle) {
+        this.handle = handle;
+        packetWatcher.setUncaughtExceptionHandler(handle);
+    }
+
     public synchronized Packet getNextPacket() {
         return packetsToBeProcessed.poll();
     }
