@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Server implements IPeer {
@@ -25,7 +26,7 @@ public class Server implements IPeer {
     private boolean running;
     private final Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
     private Ticker serverThread;
-    private final HashMap<Short,ClientData> connected = new HashMap<>();
+    private final ConcurrentHashMap<Short,ClientData> connected = new ConcurrentHashMap<>();
 
     Thread packetWatcher;
     private Thread.UncaughtExceptionHandler handle;
@@ -137,11 +138,6 @@ public class Server implements IPeer {
         return connected.values().toArray(new ClientData[0]);
     }
 
-    @Override
-    public void addExceptionHandle(Thread.UncaughtExceptionHandler handle) {
-        this.handle = handle;
-        packetWatcher.setUncaughtExceptionHandler(handle);
-    }
 
     public synchronized Packet getNextPacket() {
         return packetsToBeProcessed.poll();
