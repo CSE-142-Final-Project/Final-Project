@@ -2,8 +2,11 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
+import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
+import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ public class ClientManager {
 		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port);
 		try {
 			this.client.connect(ip, port, "Epicly Client");
+			this.client.sendPacket(new ChatPacket(this.client, "Hello it's me the client"));
 		} catch (ConnectionFailedException | UnknownHostException e) {
 			throw new RuntimeException(e);
 		}

@@ -17,7 +17,7 @@ public class Main {
 		switch (responseGetter.getProgramType()) {
 			case SERVER -> {
 				System.out.println("Becoming a Server.");
-				new GameManager(responseGetter.getIp(), responseGetter.getPort());
+				new GameManager(responseGetter.getPort());
 			}
 			case CLIENT -> {
 				System.out.println("Becoming a Client.");

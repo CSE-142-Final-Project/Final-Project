@@ -2,7 +2,7 @@
   <configuration default="false" name="Run as Client" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="com.csefinalproject.github.multiplayer.Main" />
     <module name="Multiplayer-Thing.main" />
-    <option name="PROGRAM_PARAMETERS" value="-c -ip 127.0.0.1 -port 7777" />
+    <option name="PROGRAM_PARAMETERS" value="-c -ip localhost -port 7777" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="com.csefinalproject.github.multiplayer.*" />
