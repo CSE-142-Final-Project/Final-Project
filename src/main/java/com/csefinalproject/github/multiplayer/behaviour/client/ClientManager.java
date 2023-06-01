@@ -28,22 +28,20 @@ public class ClientManager {
 		this.client = new Client();
 
 		// Create Entity List
-		System.out.println("[CLIENT] Creating EntityList.");
 		this.entityList = new ArrayList<>();
 
 		// Create ClientRenderer
-		System.out.println("[CLIENT] Creating ClientRenderer.");
+		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
 		this.clientRenderer = new ClientRenderer();
-
-		// Create Input
-		System.out.println("[CLIENT] Creating PanelInput.");
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
 
 		// Try to connect
-		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port);
+		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port + ".");
 		try {
 			this.client.connect(ip, port, "Epicly Client");
-			this.client.sendPacket(new ChatPacket(this.client, "Hello it's me the client"));
+
+			System.out.println("[CLIENT] Connected. Sending a chat packet.");
+			this.client.sendPacket(new ChatPacket(this.client, "Hello it's me the client!"));
 		} catch (ConnectionFailedException | UnknownHostException e) {
 			throw new RuntimeException(e);
 		}

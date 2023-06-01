@@ -22,7 +22,7 @@ public class GameManager {
 		instance = this;
 
 		// Create the server
-		System.out.println("[SERVER] Creating the Server");
+		System.out.println("[SERVER] Creating the Server.");
 		this.server = new Server();
 
 		// Start the server
