@@ -1,24 +1,24 @@
 package com.csefinalproject.github.multiplayer.behaviour.client;
 
+import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
-import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ClientManager {
 	private static ClientManager instance;
 
-	private Client client;
-	private ClientRenderer clientRenderer;
-	private PanelInput panelInput;
-	private List<Entity> entityList;
+	private final Client client;
+	private final ClientRenderer clientRenderer;
+	private final PanelInput panelInput;
+	private final List<Entity> entityList = new ArrayList<>();
 
 	public ClientManager(String ip, short port) {
 		instance = this;
@@ -26,9 +26,6 @@ public class ClientManager {
 		// Create Client
 		System.out.println("[CLIENT] Creating Client.");
 		this.client = new Client();
-
-		// Create Entity List
-		this.entityList = new ArrayList<>();
 
 		// Create ClientRenderer
 		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
@@ -38,12 +35,24 @@ public class ClientManager {
 		// Try to connect
 		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port + ".");
 		try {
-			this.client.connect(ip, port, "Epicly Client");
-
-			System.out.println("[CLIENT] Connected. Sending a chat packet.");
-			this.client.sendPacket(new ChatPacket(this.client, "Hello it's me the client!"));
+			this.client.connect(ip, port, "Epic Client");
 		} catch (ConnectionFailedException | UnknownHostException e) {
 			throw new RuntimeException(e);
+		}
+
+		System.out.println("[CLIENT] Connected to the server.");
+
+		// Get input from user
+		Scanner console = new Scanner(System.in);
+		while(true) {
+			if (DrawingPanel.getInstances() == 0) {
+				System.exit(0);
+			}
+
+			System.out.print("Write a message to send to the server: ");
+			String message = console.nextLine();
+
+			this.client.sendPacket(new ChatPacket(this.client, message));
 		}
 	}
 

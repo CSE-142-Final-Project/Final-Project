@@ -1,5 +1,6 @@
 package com.csefinalproject.github.multiplayer.behaviour.server;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
@@ -14,9 +15,9 @@ import com.csefinalproject.github.multiplayer.networking.server.Server;
 public class GameManager {
 	private static GameManager instance;
 
-	private Server server;
-	private NetworkEventManager networkEventManager;
-	private Map<ClientData, Entity> clientDataEntityMap;
+	private final Server server;
+	private final NetworkEventManager networkEventManager;
+	private final Map<ClientData, Entity> clientDataEntityMap = new HashMap<>();
 
 	public GameManager(short port) {
 		instance = this;
@@ -33,6 +34,7 @@ public class GameManager {
 		System.out.println("[SERVER] Creating the NetworkEventManager.");
 		this.networkEventManager = new NetworkEventManager(this.server);
 
+		// Broadcast messages sent from the clients
 		this.networkEventManager.subscribeEvent(ChatPacket.class, (ChatPacket packet) -> {
 			String message = this.server.getUserFromPacket(packet).getUsername() + ": " + packet.getMessage();
 
