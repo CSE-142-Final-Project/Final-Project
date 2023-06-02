@@ -29,7 +29,6 @@ public class Server implements IPeer {
     private final ConcurrentHashMap<Short,ClientData> connected = new ConcurrentHashMap<>();
 
     Thread packetWatcher;
-    private Thread.UncaughtExceptionHandler handle;
 
     public void start(int port) {
         if (running) {

@@ -3,10 +3,10 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 
 public class ClientRenderer {
-	private int screenWidth;
-	private int screenHeight;
+	private final int screenWidth;
+	private final int screenHeight;
 
-	private DrawingPanel drawingPanel;
+	private final DrawingPanel drawingPanel;
 
 	public ClientRenderer() {
 		this(DrawingPanel.DEFAULT_WIDTH, DrawingPanel.DEFAULT_HEIGHT);

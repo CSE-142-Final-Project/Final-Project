@@ -5,7 +5,6 @@ import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class NetworkEventManager {
@@ -51,7 +50,11 @@ public class NetworkEventManager {
 
     private void waitForRestart() {
         while (!peerToWatch.isActive()) {
-
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         eventMonitor = new Thread(this::watchForPackets);// Can't start a thread twice so instead just make a new one
         eventMonitor.start();

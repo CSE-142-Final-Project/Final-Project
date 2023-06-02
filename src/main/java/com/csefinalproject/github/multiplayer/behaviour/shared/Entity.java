@@ -6,7 +6,7 @@ import java.awt.Point;
 
 public class Entity {
 	private static short instances;
-	private short id;
+	private final short id;
 
 	private final String name;
 	private final String pathToTexture;

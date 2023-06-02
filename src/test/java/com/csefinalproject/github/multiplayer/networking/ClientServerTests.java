@@ -55,11 +55,11 @@ public class ClientServerTests {
         boolean hasAnotherPacket = server.hasNextPacket();
         assertTrue(hasAnotherPacket,"The server didn't receive a packet");
         Packet nextPacket = server.getNextPacket();
-        assertInstanceOf(SuperPacket.class,nextPacket, "The packet recieved is not of the correct type");
-        SuperPacket recieved = (SuperPacket) nextPacket;
-        assertEquals(12,recieved.number,"Data inside the packet should match");
-        assertEquals(12.0,recieved.otherNumber,"Data inside the packet should match");
-        assertEquals("I am a string",recieved.daString,"Data inside the packet should match");
+        assertInstanceOf(SuperPacket.class,nextPacket, "The packet received is not of the correct type");
+        SuperPacket received = (SuperPacket) nextPacket;
+        assertEquals(12,received.number,"Data inside the packet should match");
+        assertEquals(12.0,received.otherNumber,"Data inside the packet should match");
+        assertEquals("I am a string",received.daString,"Data inside the packet should match");
 
     }
     @Test

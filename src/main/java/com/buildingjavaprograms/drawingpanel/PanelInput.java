@@ -115,21 +115,21 @@ public class PanelInput {
   private static final int MAX_QUEUE_LENGTH = 40;
 
   // DrawingPanel being monitored
-  private DrawingPanel source;
+  private final DrawingPanel source;
 
   // used for cross-thread safety code
-  private Object lock;
+  private final Object lock;
 
   // mouse stuff
   private Point currentMousePos;
   private boolean mouseInDisplay;
   private boolean mouseDown;
   private boolean dragging;
-  private Queue<Point> mouseClicks;
+  private final Queue<Point> mouseClicks;
 
   // keyboard stuff
-  private Queue<Character> keysTyped;
-  private HashSet<Character> keysDown;
+  private final Queue<Character> keysTyped;
+  private final HashSet<Character> keysDown;
 
 	/**
 	 * Constructs an object to monitor a {@code DrawingPanel}'s user input state/events
@@ -140,9 +140,9 @@ public class PanelInput {
     this.lock = new Object();
     this.currentMousePos = new Point();
     this.mouseDown = this.dragging = this.mouseInDisplay = false;
-    this.mouseClicks = new LinkedList<Point>();
-    this.keysTyped = new LinkedList<Character>();
-    this.keysDown = new HashSet<Character>();
+    this.mouseClicks = new LinkedList<>();
+    this.keysTyped = new LinkedList<>();
+    this.keysDown = new HashSet<>();
 
     this.createKeyboardHandlers();
     this.createMouseHandlers();
@@ -172,7 +172,7 @@ public class PanelInput {
         // while key is down, keyCode will be different when key goes up,
         // and a simple remove(keyCode) would not result in the key being
         // from keysDown. Code above  addresses this problem for all letter
-        // keys, but not for the many keys where shifted and unshifted
+        // keys, but not for the many keys where shifted and un-shifted
         // characters are completely different (e.g. '1'/'!').
         //
         // For a robust system, would need DrawingPanel code changed to send
@@ -203,12 +203,8 @@ public class PanelInput {
         trimQueue(this.mouseClicks);
       }
     });
-    this.source.onMouseDown((x, y) -> {
-       this.mouseDown = true;
-    });
-    this.source.onMouseUp((x, y) -> {
-      this.dragging = this.mouseDown = false;
-    });
+    this.source.onMouseDown((x, y) -> this.mouseDown = true);
+    this.source.onMouseUp((x, y) -> this.dragging = this.mouseDown = false);
   }
 
   // no need to keep a huge backlog of events, as is almost certain

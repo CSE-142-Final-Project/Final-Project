@@ -44,7 +44,4 @@ public class ClientData {
 	protected static ClientData getFromIpAndPort(String ip, int port) {
 		return ipPortToClientData.get(ip+":"+port);
 	}
-	protected static ClientData getFromIpAndPort(String ipAndPort) {
-		return ipPortToClientData.get(ipAndPort);
-	}
 }
