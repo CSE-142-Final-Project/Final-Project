@@ -2,11 +2,17 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
+import com.csefinalproject.github.multiplayer.Main;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
+import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.InputDataPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.Packet;
+import com.csefinalproject.github.multiplayer.util.Ticker;
 
+import java.awt.*;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +25,10 @@ public class ClientManager {
 	private final ClientRenderer clientRenderer;
 	private final PanelInput panelInput;
 	private final List<Entity> entityList = new ArrayList<>();
+	final Ticker clientThread;
+	final Player player;
 
-	public ClientManager(String ip, short port) {
+	public ClientManager(String name, String ip, short port) {
 		instance = this;
 
 		// Create Client
@@ -31,36 +39,48 @@ public class ClientManager {
 		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
 		this.clientRenderer = new ClientRenderer();
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
+		connect(name, ip, port);
 
+		Player player = new Player(name, "No Path Yet, please no crash", new Point(0,0));
+
+
+		clientThread = new Ticker(Main.TPS);
+		clientThread.subscribe(this::clientTick);
+		clientThread.start();
+		ClientPacketHandler handler = new ClientPacketHandler(this,new NetworkEventManager(client));
+		handler.startHandling();
+	}
+
+	private void clientTick() {
+		if (DrawingPanel.getInstances() == 0) {
+			clientThread.stop();
+		}
+		boolean w = panelInput.keyDown('w');
+		boolean a = panelInput.keyDown('a');
+		boolean s = panelInput.keyDown('s');
+		boolean d = panelInput.keyDown('d');
+		client.sendPacket(new InputDataPacket(client, w, a, s, d, degrees));
+	}
+
+
+
+	private void connect(String name, String ip, short port) {
 		// Try to connect
 		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port + ".");
 		try {
-			this.client.connect(ip, port, "Epic Client");
+			this.client.connect(ip, port, name);
 		} catch (ConnectionFailedException | UnknownHostException e) {
 			throw new RuntimeException(e);
 		}
-
 		System.out.println("[CLIENT] Connected to the server.");
 
-		// Get input from user
-		Scanner console = new Scanner(System.in);
-		while(true) {
-			if (DrawingPanel.getInstances() == 0) {
-				System.exit(0);
-			}
-
-			System.out.print("Write a message to send to the server: ");
-			String message = console.nextLine();
-
-			this.client.sendPacket(new ChatPacket(this.client, message));
-		}
 	}
 
 	/**
 	 * Adds an {@link Entity} to the Entity list.
 	 * @param entity The entity to add.
 	 */
-	public void AddEntity(Entity entity) {
+	public synchronized void AddEntity(Entity entity) {
 		entityList.add(entity);
 	}
 
@@ -68,7 +88,7 @@ public class ClientManager {
 	 * Removes an {@link Entity} from the Entity list.
 	 * @param entity The entity to remove.
 	 */
-	public void RemoveEntity(Entity entity) {
+	public synchronized void RemoveEntity(Entity entity) {
 		entityList.remove(entity);
 	}
 

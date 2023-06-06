@@ -102,7 +102,7 @@ public class ClientServerTests {
         eventManager.subscribeEvent(SuperPacket.class,(SuperPacket p) -> {
             server.broadcast(new SuperPacket(server));
         });
-        eventManager.subscribeHandler((Thread thread, Throwable e) -> {
+        eventManager.subscribeErrorHandler((Thread thread, Throwable e) -> {
             timesFailed.incrementAndGet();
         });
         for (int i = 0; i < 20; i++) {// This number may seriously impact the trout population

@@ -73,7 +73,7 @@ public class NetworkEventManager {
         }
         subscribedEvents.get(packetType).add((Consumer<Packet>) onPacket);
     }
-    public void subscribeHandler(Thread.UncaughtExceptionHandler handle) {
+    public void subscribeErrorHandler(Thread.UncaughtExceptionHandler handle) {
         handlers.add(handle);
     }
 }

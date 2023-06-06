@@ -8,6 +8,9 @@ import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
 import java.util.Scanner;
 
 public class Main {
+
+	public static final int TPS = 20;
+
 	public static void main(String[] args) {
 		// Get if the input from the user.
 		Scanner console = new Scanner(System.in);
@@ -21,7 +24,7 @@ public class Main {
 			}
 			case CLIENT -> {
 				System.out.println("Becoming a Client.");
-				new ClientManager(responseGetter.getIp(), responseGetter.getPort());
+				new ClientManager("TODO: add names",responseGetter.getIp(), responseGetter.getPort());
 			}
 			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either be " +
 					"\"server\" or \"client\".");
