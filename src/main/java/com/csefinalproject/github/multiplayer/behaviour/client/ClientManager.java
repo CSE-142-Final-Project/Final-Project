@@ -39,14 +39,16 @@ public class ClientManager {
 		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
 		this.clientRenderer = new ClientRenderer();
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
+
+		// Connect to server
 		connect(name, ip, port);
+		this.player = new Player(name, "No Path Yet, please no crash", new Point(50,50));
 
-		this.player = new Player(name, "No Path Yet, please no crash", new Point(0,0));
-
-
+		// Create client thread and packet handler
 		this.clientThread = new Ticker(Main.TPS);
 		this.clientThread.subscribe(this::clientTick);
 		this.clientThread.start();
+
 		ClientPacketHandler handler = new ClientPacketHandler(this,new NetworkEventManager(client));
 		handler.startHandling();
 	}
@@ -55,14 +57,17 @@ public class ClientManager {
 		if (DrawingPanel.getInstances() == 0) {
 			clientThread.stop();
 		}
+
+		// Input
 		boolean w = panelInput.keyDown('w');
 		boolean a = panelInput.keyDown('a');
 		boolean s = panelInput.keyDown('s');
 		boolean d = panelInput.keyDown('d');
 		client.sendPacket(new InputDataPacket(client, w, a, s, d, 0));
+
+		// Draw all the entities
+		this.clientRenderer.DrawEntities(entityList);
 	}
-
-
 
 	private void connect(String name, String ip, short port) {
 		// Try to connect
@@ -73,7 +78,6 @@ public class ClientManager {
 			throw new RuntimeException(e);
 		}
 		System.out.println("[CLIENT] Connected to the server.");
-
 	}
 
 	/**

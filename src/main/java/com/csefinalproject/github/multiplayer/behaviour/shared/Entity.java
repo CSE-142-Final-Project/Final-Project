@@ -2,7 +2,6 @@ package com.csefinalproject.github.multiplayer.behaviour.shared;
 
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
-import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.awt.*;
 
@@ -21,9 +20,16 @@ public class Entity {
 		this.name = name;
 		this.pathToTexture = pathToTexture;
 		this.position = position;
+
+		try {
+			ClientManager.getInstance().AddEntity(this);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void Draw(DrawingPanel panel, Graphics g) {
+		g.drawString("its me", position.x, position.y);
 	}
 
 	/**
