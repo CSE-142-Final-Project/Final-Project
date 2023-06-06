@@ -1,8 +1,10 @@
 package com.csefinalproject.github.multiplayer.behaviour.shared;
 
+import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
+import com.csefinalproject.github.multiplayer.util.Ticker;
 
-import java.awt.Point;
+import java.awt.*;
 
 public class Entity {
 	private static short instances;
@@ -19,9 +21,9 @@ public class Entity {
 		this.name = name;
 		this.pathToTexture = pathToTexture;
 		this.position = position;
+	}
 
-		// Add this to the entity list.
-		ClientManager.getInstance().AddEntity(this);
+	public void Draw(DrawingPanel panel, Graphics g) {
 	}
 
 	/**
