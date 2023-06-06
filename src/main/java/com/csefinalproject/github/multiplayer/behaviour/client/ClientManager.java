@@ -41,12 +41,12 @@ public class ClientManager {
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
 		connect(name, ip, port);
 
-		Player player = new Player(name, "No Path Yet, please no crash", new Point(0,0));
+		this.player = new Player(name, "No Path Yet, please no crash", new Point(0,0));
 
 
-		clientThread = new Ticker(Main.TPS);
-		clientThread.subscribe(this::clientTick);
-		clientThread.start();
+		this.clientThread = new Ticker(Main.TPS);
+		this.clientThread.subscribe(this::clientTick);
+		this.clientThread.start();
 		ClientPacketHandler handler = new ClientPacketHandler(this,new NetworkEventManager(client));
 		handler.startHandling();
 	}
@@ -59,7 +59,7 @@ public class ClientManager {
 		boolean a = panelInput.keyDown('a');
 		boolean s = panelInput.keyDown('s');
 		boolean d = panelInput.keyDown('d');
-		client.sendPacket(new InputDataPacket(client, w, a, s, d, degrees));
+		client.sendPacket(new InputDataPacket(client, w, a, s, d, 0));
 	}
 
 
