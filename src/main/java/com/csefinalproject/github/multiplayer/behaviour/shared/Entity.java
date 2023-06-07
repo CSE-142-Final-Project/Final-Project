@@ -3,7 +3,10 @@ package com.csefinalproject.github.multiplayer.behaviour.shared;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientManager;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class Entity {
 	private static short instances;
@@ -12,6 +15,7 @@ public class Entity {
 	private final String name;
 	private final String pathToTexture;
 	private final Point position;
+	private final Image texture;
 
 	public Entity(String name, String pathToTexture, Point position) {
 		this.id = instances;
@@ -21,6 +25,14 @@ public class Entity {
 		this.pathToTexture = pathToTexture;
 		this.position = position;
 
+		// Get the texture
+		try {
+			texture = ImageIO.read(new File(pathToTexture));
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to get the texture at \"" + pathToTexture + "\"");
+		}
+
+		// Try and add it to the client manager
 		try {
 			ClientManager.getInstance().AddEntity(this);
 		} catch (Exception e) {
@@ -29,7 +41,7 @@ public class Entity {
 	}
 
 	public void Draw(DrawingPanel panel, Graphics g) {
-		g.drawString("its me", position.x, position.y);
+		// Now they can write code that draws every frame!
 	}
 
 	/**
@@ -54,5 +66,9 @@ public class Entity {
 
 	public Point getPosition() {
 		return position;
+	}
+
+	public Image getTexture() {
+		return texture;
 	}
 }
