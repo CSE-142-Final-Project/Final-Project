@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Entity {
 	private static short instances;
@@ -27,9 +28,11 @@ public class Entity {
 
 		// Get the texture
 		try {
-			texture = ImageIO.read(new File(pathToTexture));
+			texture = ImageIO.read(Objects.requireNonNull(getClass().getResource(pathToTexture)));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to get the texture at \"" + pathToTexture + "\"");
+		} catch (NullPointerException e) {
+			throw new RuntimeException("The \"" + pathToTexture + "\" resource does not exist.");
 		}
 
 		// Try and add it to the client manager

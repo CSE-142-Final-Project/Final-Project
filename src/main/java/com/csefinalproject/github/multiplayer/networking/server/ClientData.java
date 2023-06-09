@@ -14,8 +14,8 @@ public class ClientData {
 		this.ip = ip;
 		this.port = port;
 		this.username = username;
-		id = ++nextClientId;
-		lastKeepAliveTime = System.currentTimeMillis();
+		this.id = ++nextClientId;
+		this.lastKeepAliveTime = System.currentTimeMillis();
 		ipPortToClientData.put(ip+":"+port,this);
 	}
 

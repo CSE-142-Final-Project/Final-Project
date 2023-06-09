@@ -12,12 +12,14 @@ repositories {
 }
 
 sourceSets {
-    main.java.srcDir "src/main/java"
-    main.resources.srcDir "src/main/resources"
-    test.java.srcDir "src/test/java"
-    test.resources.srcDir "src/test/resources"
-    sample.java.srcDir "src/sample/java"
-    sample.resources.srcDir "src/sample/java"
+    sample {
+        java {
+            srcDir "src/sample/java"
+        }
+        resources {
+            srcDir "src/sample/resources"
+        }
+    }
 }
 
 dependencies {

@@ -42,20 +42,23 @@ public class ClientManager {
 
 		// Connect to server
 		connect(name, ip, port);
-		this.player = new Player(name, "No Path Yet, please no crash", new Point(50,50));
+		this.player = new Player(name, "/assets/player.png", new Point(50,50));
 
-		// Create client thread and packet handler
+		// Create client thread
 		this.clientThread = new Ticker(Main.TPS);
 		this.clientThread.subscribe(this::clientTick);
 		this.clientThread.start();
 
+		// Start handling packets
 		ClientPacketHandler handler = new ClientPacketHandler(this,new NetworkEventManager(client));
 		handler.startHandling();
 	}
 
 	private void clientTick() {
 		if (DrawingPanel.getInstances() == 0) {
+			client.disconnect();
 			clientThread.stop();
+			return;
 		}
 
 		// Input
