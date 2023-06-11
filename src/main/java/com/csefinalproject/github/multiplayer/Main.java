@@ -24,7 +24,7 @@ public class Main {
 			}
 			case CLIENT -> {
 				System.out.println("Becoming a Client.");
-				new ClientManager("TODO: add names", responseGetter.getIp(), responseGetter.getPort());
+				new ClientManager(responseGetter.getUsername(), responseGetter.getIp(), responseGetter.getPort());
 			}
 			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either be " +
 					"\"server\" or \"client\".");
@@ -34,6 +34,7 @@ public class Main {
 
 class CommandLineResponseGetter {
 	private final ProgramType programType;
+	private String username;
 	private String ip;
 	private final short port;
 
@@ -78,6 +79,13 @@ class CommandLineResponseGetter {
 		} else {
 			this.port = AskForPort(console);
 		}
+
+		// Get username
+		if(commandLine.hasOption("u")) {
+			this.username = commandLine.getOptionValue("u");
+		} else if (this.programType == ProgramType.CLIENT) {
+			this.username = AskForUsername(console);
+		}
 	}
 
 	/**
@@ -102,6 +110,19 @@ class CommandLineResponseGetter {
 		} else {
 			throw new IllegalArgumentException("GetResponse is supposed to return a \"server\" or \"client\" here! AAAAAA");
 		}
+	}
+
+	/**
+	 * Ask for the username of the client
+	 * @param console The System.in Scanner
+	 * @return A string with the username of the client
+	 */
+	private String AskForUsername(Scanner console) {
+		return GetResponse(console,
+				"What is your username? ",
+				"",
+				new String[] { }
+		);
 	}
 
 	/**
@@ -189,13 +210,19 @@ class CommandLineResponseGetter {
 				.build()
 		).addOption(Option.builder("s")
 				.required(false)
-				.desc("Starts a server")
+				.desc("Starts a server,")
 				.longOpt("server")
 				.build()
 		).addOption(Option.builder("c")
 				.required(false)
-				.desc("Starts a client")
+				.desc("Starts a client.")
 				.longOpt("client")
+				.build()
+		).addOption(Option.builder("u")
+				.required(false)
+				.hasArg()
+				.desc("Username of the client.")
+				.longOpt("username")
 				.build()
 		);
 
@@ -204,6 +231,10 @@ class CommandLineResponseGetter {
 
 	public ProgramType getProgramType() {
 		return programType;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 
 	public String getIp() {
