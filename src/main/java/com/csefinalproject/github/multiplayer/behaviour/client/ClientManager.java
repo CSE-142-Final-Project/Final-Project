@@ -4,19 +4,19 @@ import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.Main;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
+import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.InputDataPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.Packet;
+import com.csefinalproject.github.multiplayer.networking.packet.JoinRequestPacket;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.awt.*;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class ClientManager {
 	private static ClientManager instance;
@@ -26,7 +26,6 @@ public class ClientManager {
 	private final PanelInput panelInput;
 	private final List<Entity> entityList = new ArrayList<>();
 	final Ticker clientThread;
-	final Player player;
 
 	public ClientManager(String name, String ip, short port) {
 		instance = this;
@@ -42,7 +41,6 @@ public class ClientManager {
 
 		// Connect to server
 		connect(name, ip, port);
-		this.player = new Player(name, "/assets/player.png", new Point(50,50));
 
 		// Create client thread
 		this.clientThread = new Ticker(Main.TPS);
@@ -52,6 +50,9 @@ public class ClientManager {
 		// Start handling packets
 		ClientPacketHandler handler = new ClientPacketHandler(this,new NetworkEventManager(client));
 		handler.startHandling();
+
+		this.client.sendPacket(new ChatPacket(this.client, "Hello!!!!!!"));
+		this.client.sendPacket(new JoinRequestPacket(this.client));
 	}
 
 	private void clientTick() {

@@ -1,4 +1,4 @@
-package com.csefinalproject.github.multiplayer.behaviour.client;
+package com.csefinalproject.github.multiplayer.behaviour.shared;
 
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
@@ -9,19 +9,22 @@ import java.awt.*;
 import java.io.IOException;
 
 public class Player extends Entity {
-	private final int SIZE = 64;
+	private static final String DEFAULT_PLAYER_TEXTURE = "/assets/player.png";
 
 	public Player(String name, String pathToTexture, Point position) {
 		super(name, pathToTexture, position);
+	}
+
+	public Player(String name, Point position) {
+		this(name, DEFAULT_PLAYER_TEXTURE, position);
 	}
 
 	@Override
 	public void Draw(DrawingPanel panel, Graphics g) {
 		super.Draw(panel, g);
 
-		g.drawString(this.getName(), this.getPosition().x - 45, this.getPosition().y - 35);
-
+		// Draw username
 		g.setColor(Color.BLACK);
-		g.drawImage(getTexture(), this.getPosition().x - (SIZE / 2), this.getPosition().y - (SIZE / 2), SIZE, SIZE, null, null);
+		g.drawString(this.getName(), this.getPosition().x - 45, this.getPosition().y - 35);
 	}
 }

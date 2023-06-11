@@ -24,7 +24,7 @@ public class Main {
 			}
 			case CLIENT -> {
 				System.out.println("Becoming a Client.");
-				new ClientManager("TODO: add names",responseGetter.getIp(), responseGetter.getPort());
+				new ClientManager("TODO: add names", responseGetter.getIp(), responseGetter.getPort());
 			}
 			default -> throw new RuntimeException("Invalid program type of \"" + responseGetter.getProgramType() + "\". Must be either be " +
 					"\"server\" or \"client\".");
@@ -33,9 +33,9 @@ public class Main {
 }
 
 class CommandLineResponseGetter {
-	private ProgramType programType;
+	private final ProgramType programType;
 	private String ip;
-	private short port;
+	private final short port;
 
 	public CommandLineResponseGetter(String[] args, Scanner console) {
 		// Create command line stuff

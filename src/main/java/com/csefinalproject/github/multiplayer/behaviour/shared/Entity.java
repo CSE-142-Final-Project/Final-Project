@@ -10,16 +10,22 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class Entity {
+	private static final int SIZE = 64;
+
 	private static short instances;
 	private final short id;
 
 	private final String name;
 	private final String pathToTexture;
-	private final Point position;
 	private final Image texture;
+	private Point position;
 
 	public Entity(String name, String pathToTexture, Point position) {
-		this.id = instances;
+		this(instances, name, pathToTexture, position);
+	}
+
+	public Entity(short clientId, String name, String pathToTexture, Point position) {
+		this.id = clientId;
 		instances += 1;
 
 		this.name = name;
@@ -44,7 +50,8 @@ public class Entity {
 	}
 
 	public void Draw(DrawingPanel panel, Graphics g) {
-		// Now they can write code that draws every frame!
+		// Draw texture
+		g.drawImage(getTexture(), this.getPosition().x - (SIZE / 2), this.getPosition().y - (SIZE / 2), SIZE, SIZE, null, null);
 	}
 
 	/**
@@ -67,6 +74,9 @@ public class Entity {
 		return pathToTexture;
 	}
 
+	public void setPosition(Point newPosition) {
+		this.position = newPosition;
+	}
 	public Point getPosition() {
 		return position;
 	}
