@@ -35,13 +35,13 @@ public class ClientManager {
 		System.out.println("[CLIENT] Creating Client.");
 		this.client = new Client();
 
+		// Connect to server
+		connect(name, ip, port);
+
 		// Create ClientRenderer
 		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
 		this.clientRenderer = new ClientRenderer();
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
-
-		// Connect to server
-		connect(name, ip, port);
 
 		// Create client thread
 		this.clientThread = new Ticker(Main.TPS);
