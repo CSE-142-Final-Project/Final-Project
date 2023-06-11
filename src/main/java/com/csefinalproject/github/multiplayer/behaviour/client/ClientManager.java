@@ -68,10 +68,11 @@ public class ClientManager {
 
 		// Input
 		boolean w = panelInput.keyDown('w');
-		boolean a = panelInput.keyDown('a');
 		boolean s = panelInput.keyDown('s');
+		boolean a = panelInput.keyDown('a');
 		boolean d = panelInput.keyDown('d');
-		client.sendPacket(new InputDataPacket(client, w, a, s, d, 0));
+
+		client.sendPacket(new InputDataPacket(client, w, s, a, d, 0));
 
 		// Draw all the entities
 		this.clientRenderer.DrawEntities(entityList);

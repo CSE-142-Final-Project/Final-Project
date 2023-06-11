@@ -21,6 +21,7 @@ public class ClientPacketHandler {
     public void startHandling() {
         this.networkEventManager.subscribeEvent(PlayerJoinedPacket.class, (PlayerJoinedPacket packet) -> handleNewPlayer(packet));
         this.networkEventManager.subscribeEvent(PlayerLeftPacket.class, (PlayerLeftPacket packet) -> handlePlayerLeave(packet));
+        this.networkEventManager.subscribeEvent(PositionPacket.class, (PositionPacket packet) -> handleMovement(packet));
     }
 
     private void handleNewPlayer(PlayerJoinedPacket packet) {
@@ -35,6 +36,15 @@ public class ClientPacketHandler {
             if(entity.getId() == packet.getClientId()) {
                 System.out.println("They match!!");
                 this.clientManager.RemoveEntity(entity);
+            }
+        }
+    }
+
+    private void handleMovement(PositionPacket packet) {
+        // Set the position
+        for(Entity entity : this.clientManager.getEntityList()) {
+            if(entity.getId() == packet.getClientId()) {
+                entity.setPosition(packet.getPosition());
             }
         }
     }

@@ -3,10 +3,7 @@ package com.csefinalproject.github.multiplayer.behaviour.server;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
-import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.JoinRequestPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.PlayerJoinedPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.*;
 import com.csefinalproject.github.multiplayer.networking.server.ClientData;
 import com.csefinalproject.github.multiplayer.networking.server.Server;
 
@@ -26,6 +23,7 @@ public class GamePacketHandler {
 
     public void startHandling() {
         this.networkEventManager.subscribeEvent(ChatPacket.class, (ChatPacket packet) -> handleNewChatMessage(packet));
+        this.networkEventManager.subscribeEvent(InputDataPacket.class, (InputDataPacket packet) -> handleInput(packet));
         this.networkEventManager.subscribeEvent(JoinRequestPacket.class, (JoinRequestPacket packet) -> handleNewJoinRequest(packet));
         this.networkEventManager.subscribeEvent(PlayerLeftPacket.class, (PlayerLeftPacket packet) -> handlePlayerLeaving(packet));
     }
@@ -39,6 +37,31 @@ public class GamePacketHandler {
 
         server.broadcast(new ChatPacket(server, message));
         System.out.println(message);
+    }
+
+    private void handleInput(InputDataPacket packet) {
+        ClientData sender = this.server.getUserFromPacket(packet);
+
+        for(Map.Entry<ClientData, Entity> entry : this.gameManager.getClientDataEntityMap().entrySet()) {
+            if(entry.getKey().equals(sender)) {
+                Point position = entry.getValue().getPosition();
+                if(packet.isForward()) {
+                    position.y -= 4;
+                }
+                if (packet.isBackward()) {
+                    position.y += 4;
+                }
+                if (packet.isLeft()) {
+                    position.x -= 4;
+                }
+                if (packet.isRight()) {
+                    position.x += 4;
+                }
+
+                entry.getValue().setPosition(position);
+                this.server.broadcast(new PositionPacket(this.server, entry.getValue().getPosition(), sender.getClientID()));
+            }
+        }
     }
 
     /**
