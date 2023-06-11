@@ -17,14 +17,10 @@ public class Entity {
 
 	private final String name;
 	private final String pathToTexture;
-	private final Image texture;
+	private Image texture;
 	private Point position;
 
-	public Entity(String name, String pathToTexture, Point position) {
-		this(instances, name, pathToTexture, position);
-	}
-
-	public Entity(short clientId, String name, String pathToTexture, Point position) {
+	public Entity(String name, String pathToTexture, Point position, short clientId) {
 		this.id = clientId;
 		instances += 1;
 
@@ -32,21 +28,22 @@ public class Entity {
 		this.pathToTexture = pathToTexture;
 		this.position = position;
 
+		// If we're the server ignore getting the texture
+		if(ClientManager.getInstance() == null) {
+			return;
+		}
+
 		// Get the texture
 		try {
 			texture = ImageIO.read(Objects.requireNonNull(getClass().getResource(pathToTexture)));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to get the texture at \"" + pathToTexture + "\"");
 		} catch (NullPointerException e) {
-			throw new RuntimeException("The \"" + pathToTexture + "\" resource does not exist.");
-		}
-
-		// Try and add it to the client manager
-		try {
-			ClientManager.getInstance().AddEntity(this);
-		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		// Add it to the client manager
+		ClientManager.getInstance().AddEntity(this);
 	}
 
 	public void Draw(DrawingPanel panel, Graphics g) {

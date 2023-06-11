@@ -3,6 +3,7 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 
+import java.awt.*;
 import java.util.List;
 
 public class ClientRenderer {
@@ -29,8 +30,15 @@ public class ClientRenderer {
 	}
 
 	public void DrawEntities(List<Entity> entities) {
+		Graphics g = this.drawingPanel.getGraphics();
+
+		// Reset screen
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, this.drawingPanel.getWidth(), this.drawingPanel.getHeight());
+
+		// Draw all the entities
 		for(Entity entity : entities) {
-			entity.Draw(this.drawingPanel, this.drawingPanel.getGraphics());
+			entity.Draw(this.drawingPanel, g);
 		}
 
 		this.drawingPanel.sleep(1);

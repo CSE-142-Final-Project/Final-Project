@@ -4,7 +4,7 @@ import com.csefinalproject.github.multiplayer.networking.IPeer;
 
 public class PlayerLeftPacket extends Packet {
     public static final long serialVersionUID = SerialIds.PLAYER_LEFT_PACKET;
-    final short clientId;
+    private final short clientId;
 
     public PlayerLeftPacket(IPeer peerToSendFrom, short clientId) {
         super(peerToSendFrom);

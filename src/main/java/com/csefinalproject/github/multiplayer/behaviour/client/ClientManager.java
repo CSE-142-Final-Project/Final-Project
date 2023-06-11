@@ -11,6 +11,7 @@ import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFa
 import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.InputDataPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.JoinRequestPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.awt.*;
@@ -47,18 +48,21 @@ public class ClientManager {
 		this.clientThread.subscribe(this::clientTick);
 		this.clientThread.start();
 
+		// Send a join request
+		this.client.sendPacket(new JoinRequestPacket(this.client));
+
 		// Start handling packets
 		ClientPacketHandler handler = new ClientPacketHandler(this,new NetworkEventManager(client));
 		handler.startHandling();
-
-		this.client.sendPacket(new ChatPacket(this.client, "Hello!!!!!!"));
-		this.client.sendPacket(new JoinRequestPacket(this.client));
 	}
 
 	private void clientTick() {
 		if (DrawingPanel.getInstances() == 0) {
-			client.disconnect();
-			clientThread.stop();
+			// This is bad... but for now it works :D
+			this.client.sendPacket(new PlayerLeftPacket(this.client, (short)0));
+
+			this.client.disconnect();
+			this.clientThread.stop();
 			return;
 		}
 

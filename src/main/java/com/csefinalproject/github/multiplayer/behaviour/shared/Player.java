@@ -11,12 +11,8 @@ import java.io.IOException;
 public class Player extends Entity {
 	private static final String DEFAULT_PLAYER_TEXTURE = "/assets/player.png";
 
-	public Player(String name, String pathToTexture, Point position) {
-		super(name, pathToTexture, position);
-	}
-
-	public Player(String name, Point position) {
-		this(name, DEFAULT_PLAYER_TEXTURE, position);
+	public Player(String name, Point position, short clientId) {
+		super(name, DEFAULT_PLAYER_TEXTURE, position, clientId);
 	}
 
 	@Override
