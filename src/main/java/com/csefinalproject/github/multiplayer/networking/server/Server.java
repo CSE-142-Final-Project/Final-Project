@@ -6,6 +6,7 @@ import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecode
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionSuccessfulPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.DummyTimeoutPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.internal.KeepAlivePacket;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import com.csefinalproject.github.multiplayer.util.MessageUtils;
@@ -85,7 +86,7 @@ public class Server implements IPeer {
         for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
                 System.out.println("Making Client " + data.getClientID() + " leave the server.");
-                packetsToBeProcessed.add(new PlayerLeftPacket(this,data.getClientID()));
+                packetsToBeProcessed.add(new DummyTimeoutPacket(this,data.getClientID()));
                 // They are disconnected
                 connected.remove(data.getClientID());
             }
