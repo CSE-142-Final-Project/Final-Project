@@ -86,7 +86,7 @@ public class Server implements IPeer {
         for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
                 System.out.println("Making Client " + data.getClientID() + " leave the server.");
-                packetsToBeProcessed.add(new DummyTimeoutPacket(this,data.getClientID()));
+                packetsToBeProcessed.add(new DummyTimeoutPacket(this,data));
                 // They are disconnected
                 connected.remove(data.getClientID());
             }

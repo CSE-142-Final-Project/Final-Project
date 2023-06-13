@@ -2,16 +2,17 @@ package com.csefinalproject.github.multiplayer.networking.packet.internal;
 
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
+import com.csefinalproject.github.multiplayer.networking.server.ClientData;
 
 public class DummyTimeoutPacket extends Packet {
 
-    final int clientId;
-    public DummyTimeoutPacket(IPeer peerToSendFrom, int clientId) {
+    final ClientData data;
+    public DummyTimeoutPacket(IPeer peerToSendFrom, ClientData data) {
         super(peerToSendFrom);
-        this.clientId = clientId;
+        this.data = data;
     }
 
-    public int getClientId() {
-        return clientId;
+    public ClientData getData() {
+        return data;
     }
 }

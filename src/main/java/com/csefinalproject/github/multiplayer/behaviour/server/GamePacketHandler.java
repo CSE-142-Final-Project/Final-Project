@@ -4,6 +4,7 @@ import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 import com.csefinalproject.github.multiplayer.networking.packet.*;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.DummyTimeoutPacket;
 import com.csefinalproject.github.multiplayer.networking.server.ClientData;
 import com.csefinalproject.github.multiplayer.networking.server.Server;
 
@@ -107,5 +108,14 @@ public class GamePacketHandler {
 
         // Broadcast it to all the other clients
         this.server.broadcast(new PlayerLeftPacket(this.server, sender.getClientID()));
+    }
+
+
+    private void handleForcibleDC(DummyTimeoutPacket packet) {
+        System.out.println("[SERVER] Client " + packet.getData().getClientID() + " has timed out");
+
+        this.gameManager.getClientDataEntityMap().remove(packet.getData());
+
+        this.server.broadcast(new PlayerLeftPacket(this.server, packet.getData().getClientID()));
     }
 }
