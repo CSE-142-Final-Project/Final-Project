@@ -31,8 +31,8 @@ public class GameManager {
 		this.server = new Server();
 
 		// Start the server
-		System.out.println("[SERVER] Opening the server on port " + port + ".");
 		this.server.start(port);
+		System.out.println("[SERVER] Opening the server at " + this.server.getIp() + " on port " + port + ".");
 
 		// Create the NetworkEventManager
 		this.networkEventManager = new NetworkEventManager(this.server);
