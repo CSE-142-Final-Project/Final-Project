@@ -14,10 +14,10 @@ import com.csefinalproject.github.multiplayer.networking.packet.JoinRequestPacke
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
-import java.awt.*;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientManager {
 	private static ClientManager instance;
@@ -25,7 +25,7 @@ public class ClientManager {
 	private final Client client;
 	private final ClientRenderer clientRenderer;
 	private final PanelInput panelInput;
-	private final List<Entity> entityList = new ArrayList<>();
+	private final List<Entity> entityList = new CopyOnWriteArrayList<>();
 	final Ticker clientThread;
 
 	public ClientManager(String name, String ip, short port) {

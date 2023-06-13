@@ -30,11 +30,10 @@ public class ClientPacketHandler {
     }
 
     private void handlePlayerLeave(PlayerLeftPacket packet) {
-        System.out.println("Kicking out client " + packet.getClientId());
         // Remove all entities with the ID
         for(Entity entity : this.clientManager.getEntityList()) {
             if(entity.getId() == packet.getClientId()) {
-                System.out.println("They match!!");
+                System.out.println("[CLIENT] Kicking out Client " + packet.getClientId());
                 this.clientManager.RemoveEntity(entity);
             }
         }
