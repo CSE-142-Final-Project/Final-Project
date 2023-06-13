@@ -72,7 +72,9 @@ public class ClientManager {
 		boolean a = panelInput.keyDown('a');
 		boolean d = panelInput.keyDown('d');
 
-		client.sendPacket(new InputDataPacket(client, w, s, a, d, 0));
+		if(w || s || a || d) {
+			client.sendPacket(new InputDataPacket(client, w, s, a, d, 0));
+		}
 
 		// Draw all the entities
 		this.clientRenderer.DrawEntities(entityList);

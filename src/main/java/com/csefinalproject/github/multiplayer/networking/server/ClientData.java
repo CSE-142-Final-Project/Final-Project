@@ -44,4 +44,15 @@ public class ClientData {
 	protected static ClientData getFromIpAndPort(String ip, int port) {
 		return ipPortToClientData.get(ip+":"+port);
 	}
+
+	@Override
+	public String toString() {
+		return "ClientData{" +
+				"ip='" + ip + '\'' +
+				", port=" + port +
+				", username='" + username + '\'' +
+				", id=" + id +
+				", lastKeepAliveTime=" + lastKeepAliveTime +
+				'}';
+	}
 }

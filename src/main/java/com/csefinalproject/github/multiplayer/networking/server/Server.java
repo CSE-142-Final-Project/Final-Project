@@ -84,6 +84,7 @@ public class Server implements IPeer {
         Collection<ClientData> clientValues = connected.values();
         for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
+                System.out.println("Making Client " + data.getClientID() + " leave the server.");
                 packetsToBeProcessed.add(new PlayerLeftPacket(this,data.getClientID()));
                 // They are disconnected
                 connected.remove(data.getClientID());
@@ -115,7 +116,12 @@ public class Server implements IPeer {
         socket.close();
     }
     public void send(Packet packet, short client) {
-        sendMessageToClient(packet,connected.get(client));
+        ClientData target = connected.get(client);
+        System.out.println(target);
+        if (target == null) {
+            throw new IllegalArgumentException("That client has been disconnected ");
+        }
+        sendMessageToClient(packet,target);
     }
     public void broadcast(Packet packet) {
         Collection<ClientData> clientValues = connected.values();
@@ -163,4 +169,5 @@ public class Server implements IPeer {
     public boolean isActive() {
         return running;
     }
+
 }
