@@ -27,7 +27,7 @@ public class MessageUtils {
             stream.writeObject(packet);
             stream.flush();
             if (buffer.size() > IPeer.DEFAULT_PACKET_SIZE) {
-                throw new IllegalArgumentException("The passed packet was to big, Either make it smaller or increase the default max");
+                throw new IllegalArgumentException("The passed packet was too big, Either make it smaller or increase the default max");
             }
             return new DatagramPacket(buffer.toByteArray(),buffer.size());
         } catch (IOException e) {

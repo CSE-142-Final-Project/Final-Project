@@ -1,10 +1,13 @@
 package com.csefinalproject.github.multiplayer.networking.server;
 
+import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
-import com.csefinalproject.github.multiplayer.networking.packet.ConnectionPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.ConnectionSuccessfulPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.KeepAlivePacket;
+import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionSuccessfulPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.DummyTimeoutPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.KeepAlivePacket;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
@@ -15,6 +18,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Server implements IPeer {
@@ -25,7 +29,10 @@ public class Server implements IPeer {
     private boolean running;
     private final Queue<Packet> packetsToBeProcessed = new ConcurrentLinkedQueue<>();
     private Ticker serverThread;
-    private final HashMap<Short,ClientData> connected = new HashMap<>();
+    private final ConcurrentHashMap<Short,ClientData> connected = new ConcurrentHashMap<>();
+
+    Thread packetWatcher;
+
     public void start(int port) {
         if (running) {
             throw new IllegalStateException("Please disconnect the server before attempting to start it again");
@@ -35,7 +42,7 @@ public class Server implements IPeer {
 
         running = true;
         serverThread = new Ticker(IPeer.DEFAULT_TPS);
-        Thread packetWatcher = new Thread(this::packetWatch);
+        packetWatcher = new Thread(this::packetWatch);
         serverThread.subscribe(this::serverTick);
         serverThread.start();
         packetWatcher.start();
@@ -52,6 +59,10 @@ public class Server implements IPeer {
                     send(new ConnectionSuccessfulPacket(this),newClient.getClientID());
                 } else if (packet instanceof KeepAlivePacket keepAlivePacket) {// Note that we got a keep alive packet and send one back
                     ClientData sender = ClientData.getFromIpAndPort(keepAlivePacket.getIp(),keepAlivePacket.getPort());
+                    if (sender == null) {
+                        // This is quite odd
+                        continue;
+                    }
                     connected.get(sender.getClientID()).setLastReceivedPacketTime(System.currentTimeMillis());
                     send(new KeepAlivePacket(this),sender.getClientID());
                 } else {
@@ -74,12 +85,13 @@ public class Server implements IPeer {
         // iterate through the connected clients
         long currentTime = System.currentTimeMillis();
 
-        for (ClientData data : connected.values()) {
+        Collection<ClientData> clientValues = connected.values();
+        for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
+                packetsToBeProcessed.add(new DummyTimeoutPacket(this,data));
                 // They are disconnected
                 connected.remove(data.getClientID());
             }
-
         }
     }
 
@@ -107,10 +119,15 @@ public class Server implements IPeer {
         socket.close();
     }
     public void send(Packet packet, short client) {
-        sendMessageToClient(packet,connected.get(client));
+        ClientData target = connected.get(client);
+        if (target == null) {
+            throw new IllegalArgumentException("That client has been disconnected ");
+        }
+        sendMessageToClient(packet,target);
     }
     public void broadcast(Packet packet) {
-        for (ClientData data : connected.values()) {
+        Collection<ClientData> clientValues = connected.values();
+        for (ClientData data : clientValues) {
             sendMessageToClient(packet,data);
         }
     }
@@ -132,6 +149,8 @@ public class Server implements IPeer {
     public ClientData[] getClientData() {
         return connected.values().toArray(new ClientData[0]);
     }
+
+
     public synchronized Packet getNextPacket() {
         return packetsToBeProcessed.poll();
     }
@@ -152,4 +171,5 @@ public class Server implements IPeer {
     public boolean isActive() {
         return running;
     }
+
 }

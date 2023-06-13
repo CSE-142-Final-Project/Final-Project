@@ -11,11 +11,19 @@ public class NetworkEventManager {
     private final HashMap<Class<? extends Packet>, List<Consumer<Packet>>> subscribedEvents;
     private Thread eventMonitor;
     private final IPeer peerToWatch;
+    private ArrayList<Thread.UncaughtExceptionHandler> handlers;
+    Thread.UncaughtExceptionHandler handle;
     public NetworkEventManager(IPeer peer) {
         subscribedEvents = new HashMap<>();
         peerToWatch = peer;
         eventMonitor = new Thread(this::watchForPackets);
         eventMonitor.start();
+        handle = (t, e) -> {
+            for (Thread.UncaughtExceptionHandler handler : handlers) {
+                handler.uncaughtException(t, e);
+            }
+        };
+        handlers = new ArrayList<>();
     }
     private void watchForPackets() {
         while (peerToWatch.isActive()) {
@@ -29,7 +37,9 @@ public class NetworkEventManager {
             if (subscribedEvents.containsKey(packetClass)) {
                 for (Consumer<Packet> event : subscribedEvents.get(packetClass)) {
                     Thread thread = new Thread(() -> event.accept(packet));
+                    thread.setUncaughtExceptionHandler(handle);
                     thread.start();
+
                 }
             }
         }
@@ -40,7 +50,11 @@ public class NetworkEventManager {
 
     private void waitForRestart() {
         while (!peerToWatch.isActive()) {
-
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         eventMonitor = new Thread(this::watchForPackets);// Can't start a thread twice so instead just make a new one
         eventMonitor.start();
@@ -58,5 +72,8 @@ public class NetworkEventManager {
             subscribedEvents.put(packetType, new ArrayList<>());
         }
         subscribedEvents.get(packetType).add((Consumer<Packet>) onPacket);
+    }
+    public void subscribeErrorHandler(Thread.UncaughtExceptionHandler handle) {
+        handlers.add(handle);
     }
 }

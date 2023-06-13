@@ -9,8 +9,8 @@ public interface IPeer {
      */
     int DEFAULT_CONNECTION_TIMEOUT = 10;
     int DEFAULT_PACKET_SIZE = 512;
-    int DEFAULT_KEEP_ALIVE_INTERVAL = 5;// 5 seconds
-    int DEFAULT_KEEP_ALIVE_GRACE = 5;// 5 seconds of leeway on-top of the interval there supposed to be sent
+    int DEFAULT_KEEP_ALIVE_INTERVAL = 2;// 5 seconds
+    int DEFAULT_KEEP_ALIVE_GRACE = 2;// 5 seconds of leeway on-top of the interval there supposed to be sent
 
     Packet getNextPacket();
     boolean hasNextPacket();

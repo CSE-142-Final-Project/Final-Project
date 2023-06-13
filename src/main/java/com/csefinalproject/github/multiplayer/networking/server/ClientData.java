@@ -14,8 +14,8 @@ public class ClientData {
 		this.ip = ip;
 		this.port = port;
 		this.username = username;
-		id = ++nextClientId;
-		lastKeepAliveTime = System.currentTimeMillis();
+		this.id = ++nextClientId;
+		this.lastKeepAliveTime = System.currentTimeMillis();
 		ipPortToClientData.put(ip+":"+port,this);
 	}
 
@@ -44,7 +44,15 @@ public class ClientData {
 	protected static ClientData getFromIpAndPort(String ip, int port) {
 		return ipPortToClientData.get(ip+":"+port);
 	}
-	protected static ClientData getFromIpAndPort(String ipAndPort) {
-		return ipPortToClientData.get(ipAndPort);
+
+	@Override
+	public String toString() {
+		return "ClientData{" +
+				"ip='" + ip + '\'' +
+				", port=" + port +
+				", username='" + username + '\'' +
+				", id=" + id +
+				", lastKeepAliveTime=" + lastKeepAliveTime +
+				'}';
 	}
 }

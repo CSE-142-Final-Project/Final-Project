@@ -1,12 +1,16 @@
 package com.csefinalproject.github.multiplayer.behaviour.client;
 
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
+import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
+
+import java.awt.*;
+import java.util.List;
 
 public class ClientRenderer {
-	private int screenWidth;
-	private int screenHeight;
+	private final int screenWidth;
+	private final int screenHeight;
 
-	private DrawingPanel drawingPanel;
+	private final DrawingPanel drawingPanel;
 
 	public ClientRenderer() {
 		this(DrawingPanel.DEFAULT_WIDTH, DrawingPanel.DEFAULT_HEIGHT);
@@ -23,6 +27,21 @@ public class ClientRenderer {
 
 		System.out.println("[CLIENT] Creating DrawingPanel.");
 		this.drawingPanel = new DrawingPanel(this.screenWidth, this.screenHeight);
+	}
+
+	public void DrawEntities(List<Entity> entities) {
+		Graphics g = this.drawingPanel.getGraphics();
+
+		// Reset screen
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, this.drawingPanel.getWidth(), this.drawingPanel.getHeight());
+
+		// Draw all the entities
+		for(Entity entity : entities) {
+			entity.Draw(this.drawingPanel, g);
+		}
+
+		this.drawingPanel.sleep(1);
 	}
 
 	public int getScreenWidth() {

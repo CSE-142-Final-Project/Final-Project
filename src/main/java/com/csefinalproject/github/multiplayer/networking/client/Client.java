@@ -3,9 +3,9 @@ package com.csefinalproject.github.multiplayer.networking.client;
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
-import com.csefinalproject.github.multiplayer.networking.packet.ConnectionPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.ConnectionSuccessfulPacket;
-import com.csefinalproject.github.multiplayer.networking.packet.KeepAlivePacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionSuccessfulPacket;
+import com.csefinalproject.github.multiplayer.networking.packet.internal.KeepAlivePacket;
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
@@ -29,6 +29,8 @@ public class Client implements IPeer {
 
     private long lastKeepAlivePacketSent = 0L;
 
+    Thread packetWatcher;
+
     public void connect(String ip, int port, String username) throws ConnectionFailedException, UnknownHostException {
         if (isConnected) {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
@@ -39,7 +41,7 @@ public class Client implements IPeer {
 
 
         clientThread = new Ticker(IPeer.DEFAULT_TPS);
-        Thread packetWatcher = new Thread(this::packetWatch);
+        packetWatcher = new Thread(this::packetWatch);
         clientThread.subscribe(this::clientTick);
         clientThread.start();
         packetWatcher.start();
@@ -76,7 +78,7 @@ public class Client implements IPeer {
             clientThread.stop();
             return;
         }
-        // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
+        // Internally, we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
         long currentTime = System.currentTimeMillis();
 
         if ((currentTime - lastKeepAlivePacketSent ) / 1000L > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL) {
@@ -127,6 +129,7 @@ public class Client implements IPeer {
     public double lastKeepAlivePacketTime() {
         return (lastKeepAlivePacketTime - System.currentTimeMillis()) / 1000.0;
     }
+
 
     @Override
     public synchronized Packet getNextPacket() {
