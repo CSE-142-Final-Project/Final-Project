@@ -88,7 +88,7 @@ public class GamePacketHandler {
         // Create player
         Player newPlayer = new Player(sender.getUsername(), new Point(60,60), sender.getClientID());
 
-        // Add to entity map
+        // Add to the entity map
         clientDataEntityMap.put(sender, newPlayer);
 
         // Broadcast a join
