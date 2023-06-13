@@ -67,10 +67,10 @@ public class ClientManager {
 		}
 
 		// Input
-		boolean w = panelInput.keyDown('w');
-		boolean s = panelInput.keyDown('s');
-		boolean a = panelInput.keyDown('a');
-		boolean d = panelInput.keyDown('d');
+		boolean w = panelInput.keyDown('w') || panelInput.keyDown('W');
+		boolean s = panelInput.keyDown('s') || panelInput.keyDown('S');
+		boolean a = panelInput.keyDown('a') || panelInput.keyDown('A');
+		boolean d = panelInput.keyDown('d') || panelInput.keyDown('D');
 
 		if(w || s || a || d) {
 			client.sendPacket(new InputDataPacket(client, w, s, a, d, 0));
