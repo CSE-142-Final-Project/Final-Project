@@ -59,6 +59,10 @@ public class Server implements IPeer {
                     send(new ConnectionSuccessfulPacket(this),newClient.getClientID());
                 } else if (packet instanceof KeepAlivePacket keepAlivePacket) {// Note that we got a keep alive packet and send one back
                     ClientData sender = ClientData.getFromIpAndPort(keepAlivePacket.getIp(),keepAlivePacket.getPort());
+                    if (sender == null) {
+                        // This is quite odd
+                        continue;
+                    }
                     connected.get(sender.getClientID()).setLastReceivedPacketTime(System.currentTimeMillis());
                     send(new KeepAlivePacket(this),sender.getClientID());
                 } else {
@@ -76,7 +80,6 @@ public class Server implements IPeer {
     private void serverTick() {
         if (!running && serverThread.isRunning())
         {
-            System.out.println("Test");
             serverThread.stop();
         }
         // iterate through the connected clients
@@ -85,7 +88,6 @@ public class Server implements IPeer {
         Collection<ClientData> clientValues = connected.values();
         for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
-                System.out.println("Making Client " + data.getClientID() + " leave the server.");
                 packetsToBeProcessed.add(new DummyTimeoutPacket(this,data));
                 // They are disconnected
                 connected.remove(data.getClientID());
@@ -118,7 +120,6 @@ public class Server implements IPeer {
     }
     public void send(Packet packet, short client) {
         ClientData target = connected.get(client);
-        System.out.println(target);
         if (target == null) {
             throw new IllegalArgumentException("That client has been disconnected ");
         }

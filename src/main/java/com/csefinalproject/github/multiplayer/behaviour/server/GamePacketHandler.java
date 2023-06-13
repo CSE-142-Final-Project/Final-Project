@@ -27,6 +27,7 @@ public class GamePacketHandler {
         this.networkEventManager.subscribeEvent(InputDataPacket.class, (InputDataPacket packet) -> handleInput(packet));
         this.networkEventManager.subscribeEvent(JoinRequestPacket.class, (JoinRequestPacket packet) -> handleNewJoinRequest(packet));
         this.networkEventManager.subscribeEvent(PlayerLeftPacket.class, (PlayerLeftPacket packet) -> handlePlayerLeaving(packet));
+        this.networkEventManager.subscribeEvent(DummyTimeoutPacket.class, (DummyTimeoutPacket packet) -> handleForcibleDC(packet));
     }
 
     /**
@@ -70,6 +71,7 @@ public class GamePacketHandler {
      */
     private void handleNewJoinRequest(JoinRequestPacket packet) {
         ClientData sender = this.server.getUserFromPacket(packet);
+        System.out.println("[SERVER] " + sender.getIP() + ":" + sender.getPort() + " is asking to connect");
         Map<ClientData, Entity> clientDataEntityMap = this.gameManager.getClientDataEntityMap();
 
         // Send all the previous players
@@ -80,7 +82,6 @@ public class GamePacketHandler {
                     existingClient.getUsername(),
                     existingClient.getClientID()
             );
-
             // Send it to the new client
             this.server.send(previousPlayerJoin, sender.getClientID());
         }
@@ -112,10 +113,11 @@ public class GamePacketHandler {
 
 
     private void handleForcibleDC(DummyTimeoutPacket packet) {
-        System.out.println("[SERVER] Client " + packet.getData().getClientID() + " has timed out");
+        ClientData disconnected = packet.getData();
+        System.out.println("[SERVER] Client " + disconnected.getClientID() + " has timed out");
 
-        this.gameManager.getClientDataEntityMap().remove(packet.getData());
+        this.gameManager.getClientDataEntityMap().remove(disconnected);
 
-        this.server.broadcast(new PlayerLeftPacket(this.server, packet.getData().getClientID()));
+        this.server.broadcast(new PlayerLeftPacket(this.server, disconnected.getClientID()));
     }
 }

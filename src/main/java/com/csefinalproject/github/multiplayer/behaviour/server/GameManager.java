@@ -3,6 +3,7 @@ package com.csefinalproject.github.multiplayer.behaviour.server;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.csefinalproject.github.multiplayer.behaviour.client.ClientPacketHandler;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
@@ -21,7 +22,7 @@ public class GameManager {
 	private final Server server;
 	private final NetworkEventManager networkEventManager;
 	private final GamePacketHandler gamePacketHandler;
-	private final Map<ClientData, Entity> clientDataEntityMap = new HashMap<ClientData,Entity>();
+	private final Map<ClientData, Entity> clientDataEntityMap = new ConcurrentHashMap<>();
 
 	public GameManager(short port) {
 		instance = this;
