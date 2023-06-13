@@ -26,7 +26,9 @@ public class ClientManager {
 	private final ClientRenderer clientRenderer;
 	private final PanelInput panelInput;
 	private final List<Entity> entityList = new CopyOnWriteArrayList<>();
-	final Ticker clientThread;
+	private final Ticker clientThread;
+
+	private boolean isChatting = false;
 
 	public ClientManager(String name, String ip, short port) {
 		instance = this;
@@ -64,6 +66,20 @@ public class ClientManager {
 			this.client.disconnect();
 			this.clientThread.stop();
 			return;
+		}
+
+		// Basic chatting
+		if(panelInput.keyDown('t') && !this.isChatting) {
+			this.isChatting = true;
+			System.out.println("I am ready to chat");
+			while(this.isChatting) {
+				System.out.println(panelInput.readKey());
+				if(this.panelInput.keyDown('\n')) {
+					this.panelInput.flushKeyboardEvents();
+					System.out.println("I am done chatting.");
+					this.isChatting = false;
+				}
+			}
 		}
 
 		// Input
@@ -121,5 +137,9 @@ public class ClientManager {
 
 	public List<Entity> getEntityList() {
 		return entityList;
+	}
+
+	public boolean isChatting() {
+		return isChatting;
 	}
 }
