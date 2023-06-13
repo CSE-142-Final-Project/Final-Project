@@ -2,6 +2,7 @@ package com.csefinalproject.github.multiplayer.networking.server;
 
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
+import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.internal.ConnectionSuccessfulPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.internal.KeepAlivePacket;
@@ -81,6 +82,7 @@ public class Server implements IPeer {
         Collection<ClientData> clientValues = connected.values();
         for (ClientData data : clientValues) {
             if ((currentTime - data.getLastReceivedPacketTime()) / 1000 >= IPeer.DEFAULT_KEEP_ALIVE_INTERVAL + IPeer.DEFAULT_KEEP_ALIVE_GRACE) {
+                packetsToBeProcessed.add(new PlayerLeftPacket(this,data.getClientID()));
                 // They are disconnected
                 connected.remove(data.getClientID());
             }
