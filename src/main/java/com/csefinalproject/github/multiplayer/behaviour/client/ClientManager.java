@@ -44,7 +44,7 @@ public class ClientManager {
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
 
 		// Create client thread
-		this.clientThread = new Ticker(Main.TPS * 20);
+		this.clientThread = new Ticker(Main.TPS);
 		this.clientThread.subscribe(this::clientTick);
 		this.clientThread.start();
 

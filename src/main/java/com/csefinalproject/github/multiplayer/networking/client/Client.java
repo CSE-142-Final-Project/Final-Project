@@ -78,7 +78,7 @@ public class Client implements IPeer {
             clientThread.stop();
             return;
         }
-        // Internally we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
+        // Internally, we just need to send a keep alive packet every so often and disconnect if they haven't sent one recently enough
         long currentTime = System.currentTimeMillis();
 
         if ((currentTime - lastKeepAlivePacketSent ) / 1000L > IPeer.DEFAULT_KEEP_ALIVE_INTERVAL) {

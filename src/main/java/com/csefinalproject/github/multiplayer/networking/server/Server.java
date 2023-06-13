@@ -1,5 +1,6 @@
 package com.csefinalproject.github.multiplayer.networking.server;
 
+import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 import com.csefinalproject.github.multiplayer.networking.exceptions.PacketDecodeError;
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
@@ -74,6 +75,7 @@ public class Server implements IPeer {
     private void serverTick() {
         if (!running && serverThread.isRunning())
         {
+            System.out.println("Test");
             serverThread.stop();
         }
         // iterate through the connected clients
