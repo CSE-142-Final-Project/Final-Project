@@ -101,15 +101,15 @@ public class ClientManager {
 			System.out.println(latestKey);
 			message.add(latestKey + "");
 
-			if(panelInput.keyDown(']')) {
+			if(panelInput.keyDown('\b')) {
 				System.out.println("backspace!!!");
-				message.remove(message.size() - 1);
+				message.remove(message.size() - 2);
 			}
 
-			if(panelInput.keyDown('\\')) {
+			if(panelInput.keyDown('\n')) {
 				// change da world, my final message.. goodbye...
 				String[] finalMessageArray = Arrays.copyOf(message.toArray(new String[0]), message.size() - 1);
-				String finalMessage = String.join("", finalMessageArray).replace('\n', '\\');
+				String finalMessage = String.join("", finalMessageArray);
 
 				System.out.println(finalMessage);
 				this.client.sendPacket(new ChatPacket(this.client, finalMessage));
