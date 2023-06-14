@@ -12,10 +12,12 @@ import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.InputDataPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.JoinRequestPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
+import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -68,18 +70,8 @@ public class ClientManager {
 			return;
 		}
 
-		// Basic chatting
 		if(panelInput.keyDown('t') && !this.isChatting) {
-			this.isChatting = true;
-			System.out.println("I am ready to chat");
-			while(this.isChatting) {
-				System.out.println(panelInput.readKey());
-				if(this.panelInput.keyDown('\n')) {
-					this.panelInput.flushKeyboardEvents();
-					System.out.println("I am done chatting.");
-					this.isChatting = false;
-				}
-			}
+			startChatting();
 		}
 
 		// Input
@@ -94,6 +86,40 @@ public class ClientManager {
 
 		// Draw all the entities
 		this.clientRenderer.DrawEntities(entityList);
+
+		panelInput.flushKeyboardEvents();
+	}
+
+	private void startChatting() {
+		this.isChatting = true;
+
+		panelInput.flushKeyboardEvents();
+
+		List<String> message = new ArrayList<>();
+		while(this.isChatting) {
+			char latestKey = panelInput.readKey();
+			System.out.println(latestKey);
+			message.add(latestKey + "");
+
+			if(panelInput.keyDown(']')) {
+				System.out.println("backspace!!!");
+				message.remove(message.size() - 1);
+			}
+
+			if(panelInput.keyDown('\\')) {
+				// change da world, my final message.. goodbye...
+				String[] finalMessageArray = Arrays.copyOf(message.toArray(new String[0]), message.size() - 1);
+				String finalMessage = String.join("", finalMessageArray).replace('\n', '\\');
+
+				System.out.println(finalMessage);
+				this.client.sendPacket(new ChatPacket(this.client, finalMessage));
+
+				this.isChatting = false;
+				break;
+			}
+		}
+
+		panelInput.flushKeyboardEvents();
 	}
 
 	private void connect(String name, String ip, short port) {
