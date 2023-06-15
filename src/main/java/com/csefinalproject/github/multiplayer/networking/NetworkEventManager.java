@@ -7,12 +7,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * This class is responsible for managing events that are called when a packet is received
+ */
 public class NetworkEventManager {
     private final HashMap<Class<? extends Packet>, List<Consumer<Packet>>> subscribedEvents;
     private Thread eventMonitor;
     private final IPeer peerToWatch;
     private ArrayList<Thread.UncaughtExceptionHandler> handlers;
     Thread.UncaughtExceptionHandler handle;
+
+    /**
+     * Creates a new NetworkEventManager. As this object is created it will start a thread to watch for packets
+     * @param peer The peer to watch for packets
+     */
     public NetworkEventManager(IPeer peer) {
         subscribedEvents = new HashMap<>();
         peerToWatch = peer;
