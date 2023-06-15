@@ -7,6 +7,9 @@ import com.csefinalproject.github.multiplayer.behaviour.server.GameManager;
 
 import java.util.Scanner;
 
+/**
+ * This class is responsible for getting command line input and starting the program
+ */
 public class Main {
 
 	public static final int TPS = 20;
@@ -32,6 +35,9 @@ public class Main {
 	}
 }
 
+/**
+ * Simple class for getting the command line arguments
+ */
 class CommandLineResponseGetter {
 	private final ProgramType programType;
 	private String username;
