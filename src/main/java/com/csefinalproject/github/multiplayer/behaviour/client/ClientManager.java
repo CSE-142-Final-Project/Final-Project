@@ -3,8 +3,8 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.Main;
+import com.csefinalproject.github.multiplayer.behaviour.client.keyboard.KeyboardManager;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
-import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
@@ -12,12 +12,9 @@ import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.InputDataPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.JoinRequestPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
-import com.csefinalproject.github.multiplayer.util.MessageUtils;
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -29,7 +26,7 @@ public class ClientManager {
 	private final PanelInput panelInput;
 	private final List<Entity> entityList = new CopyOnWriteArrayList<>();
 	private final Ticker clientThread;
-
+	private final KeyboardManager keyboardManager;
 	private boolean isChatting = false;
 
 	public ClientManager(String name, String ip, short port) {
@@ -46,6 +43,7 @@ public class ClientManager {
 		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
 		this.clientRenderer = new ClientRenderer();
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
+		this.keyboardManager = new KeyboardManager(panelInput);
 
 		// Create client thread
 		this.clientThread = new Ticker(Main.TPS);
@@ -70,8 +68,34 @@ public class ClientManager {
 			return;
 		}
 
-		if(panelInput.keyDown('t') && !this.isChatting) {
-			startChatting();
+		// Draw all the entities
+		this.clientRenderer.DrawEntities(entityList);
+
+		// If we're looking to chat, start a chat.
+		if(this.panelInput.keyDown('t') && !this.isChatting) {
+			this.isChatting = true;
+			this.panelInput.flushKeyboardEvents();
+		}
+
+		// If we're chatting, keep checking for keyboard events.
+		if(this.isChatting) {
+			// Update the chat and set isChatting to if we're done or not
+			this.isChatting = !this.keyboardManager.updateChat();
+
+			String currentMessage = this.keyboardManager.getText();
+
+			// Draw the chat message
+			this.clientRenderer.getDrawingPanel().getGraphics().drawString(
+					"Type your chat message: " + currentMessage,
+					2, 10
+			);
+
+			if(!this.isChatting) {
+				this.client.sendPacket(new ChatPacket(this.client, currentMessage));
+			}
+
+			// Return, we don't want to do anything else.
+			return;
 		}
 
 		// Input
@@ -83,43 +107,6 @@ public class ClientManager {
 		if(w || s || a || d) {
 			client.sendPacket(new InputDataPacket(client, w, s, a, d, 0));
 		}
-
-		// Draw all the entities
-		this.clientRenderer.DrawEntities(entityList);
-
-		panelInput.flushKeyboardEvents();
-	}
-
-	private void startChatting() {
-		this.isChatting = true;
-
-		panelInput.flushKeyboardEvents();
-
-		List<String> message = new ArrayList<>();
-		while(this.isChatting) {
-			char latestKey = panelInput.readKey();
-			System.out.println(latestKey);
-			message.add(latestKey + "");
-
-			if(panelInput.keyDown('\b')) {
-				System.out.println("backspace!!!");
-				message.remove(message.size() - 2);
-			}
-
-			if(panelInput.keyDown('\n')) {
-				// change da world, my final message.. goodbye...
-				String[] finalMessageArray = Arrays.copyOf(message.toArray(new String[0]), message.size() - 1);
-				String finalMessage = String.join("", finalMessageArray);
-
-				System.out.println(finalMessage);
-				this.client.sendPacket(new ChatPacket(this.client, finalMessage));
-
-				this.isChatting = false;
-				break;
-			}
-		}
-
-		panelInput.flushKeyboardEvents();
 	}
 
 	private void connect(String name, String ip, short port) {
