@@ -12,9 +12,8 @@ import java.util.Scanner;
  */
 public class Main {
 	/**
-	 * The Ticks per
+	 * The Ticks per second
 	 */
-
 	public static final int TPS = 20;
 
 	/**
