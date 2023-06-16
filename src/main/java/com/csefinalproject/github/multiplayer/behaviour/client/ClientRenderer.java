@@ -6,16 +6,27 @@ import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * This class is used to render the game and contains all the rendering logic
+ */
 public class ClientRenderer {
 	private final int screenWidth;
 	private final int screenHeight;
 
 	private final DrawingPanel drawingPanel;
 
+	/**
+	 * This constructor is used to create a new client renderer (It uses the {@link DrawingPanel#DEFAULT_WIDTH} and {@link DrawingPanel#DEFAULT_HEIGHT
+	 */
 	public ClientRenderer() {
 		this(DrawingPanel.DEFAULT_WIDTH, DrawingPanel.DEFAULT_HEIGHT);
 	}
 
+	/**
+	 * This constructor is used to create a new client renderer
+	 * @param screenWidth the width of the screen
+	 * @param screenHeight the height of the screen
+	 */
 	public ClientRenderer(int screenWidth, int screenHeight) {
 		// Catch any invalid window sizes and just set it to the default
 		if(screenWidth > 0 && screenHeight > 0) {
@@ -29,6 +40,10 @@ public class ClientRenderer {
 		this.drawingPanel = new DrawingPanel(this.screenWidth, this.screenHeight);
 	}
 
+	/**
+	 * This method is used to draw all the entities
+	 * @param entities the entities to draw
+	 */
 	public void DrawEntities(List<Entity> entities) {
 		Graphics g = this.drawingPanel.getGraphics();
 
@@ -44,14 +59,26 @@ public class ClientRenderer {
 		this.drawingPanel.sleep(1);
 	}
 
+	/**
+	 * This method is used to get the width of the screen
+	 * @return the width of the screen
+	 */
 	public int getScreenWidth() {
 		return screenWidth;
 	}
 
+	/**
+	 * This method is used to get the height of the screen
+	 * @return the height of the screen
+	 */
 	public int getScreenHeight() {
 		return screenHeight;
 	}
 
+	/**
+	 * This method is used to get the drawing panel
+	 * @return
+	 */
 	public DrawingPanel getDrawingPanel() {
 		return drawingPanel;
 	}

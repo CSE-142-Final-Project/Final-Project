@@ -11,17 +11,29 @@ import com.csefinalproject.github.multiplayer.networking.server.Server;
 import java.awt.*;
 import java.util.Map;
 
+/**
+ * This class is used to handle packets sent from the clients
+ */
 public class GamePacketHandler {
+
     private final GameManager gameManager;
     private final Server server;
     private final NetworkEventManager networkEventManager;
 
+    /**
+     * This constructor is used to create a new game packet handler
+     * @param gameManager the game manager
+     * @param networkEventManager the network event manager
+     */
     public GamePacketHandler(GameManager gameManager, NetworkEventManager networkEventManager) {
         this.gameManager = gameManager;
         this.server = gameManager.getServer();
         this.networkEventManager = networkEventManager;
     }
 
+    /**
+     * This method is used to start handling events
+     */
     public void startHandling() {
         this.networkEventManager.subscribeEvent(ChatPacket.class, (ChatPacket packet) -> handleNewChatMessage(packet));
         this.networkEventManager.subscribeEvent(InputDataPacket.class, (InputDataPacket packet) -> handleInput(packet));
@@ -41,6 +53,10 @@ public class GamePacketHandler {
         System.out.println(message);
     }
 
+    /**
+     * This method is used to handle player input
+     * @param packet the input data packet
+     */
     private void handleInput(InputDataPacket packet) {
         ClientData sender = this.server.getUserFromPacket(packet);
 
@@ -111,7 +127,10 @@ public class GamePacketHandler {
         this.server.broadcast(new PlayerLeftPacket(this.server, sender.getClientID()));
     }
 
-
+    /**
+     * Handle a forcible disconnect
+     * @param packet the fake packet containing the client data
+     */
     private void handleForcibleDC(DummyTimeoutPacket packet) {
         ClientData disconnected = packet.getData();
         System.out.println("[SERVER] Client " + disconnected.getClientID() + " has timed out");

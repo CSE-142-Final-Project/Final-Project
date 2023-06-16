@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * This class is used to represent an entity
+ */
 public class Entity {
 	private static final int SIZE = 64;
 
@@ -20,6 +23,13 @@ public class Entity {
 	private Image texture;
 	private Point position;
 
+	/**
+	 * This constructor is used to create a new entity
+	 * @param name the name of the entity
+	 * @param pathToTexture the path to the texture
+	 * @param position the position of the entity
+	 * @param clientId the client id of the entity
+	 */
 	public Entity(String name, String pathToTexture, Point position, short clientId) {
 		this.id = clientId;
 		instances += 1;
@@ -59,25 +69,50 @@ public class Entity {
 		ClientManager.getInstance().RemoveEntity(this);
 	}
 
+	/**
+	 * This method is used to get the id
+	 * @return the id
+	 */
 	public short getId() {
 		return id;
 	}
 
+	/**
+	 * This method is used to get the name
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * This method is used to get the path to the texture
+	 * @return the path to the texture
+	 */
 	public String getPathToTexture() {
 		return pathToTexture;
 	}
 
+	/**
+	 * This method is used to set the position
+	 * @param newPosition the new position
+	 */
 	public void setPosition(Point newPosition) {
 		this.position = newPosition;
 	}
+
+	/**
+	 * This method is used to get the position
+	 * @return the position
+	 */
 	public Point getPosition() {
 		return position;
 	}
 
+	/**
+	 * This method is used to get the texture
+	 * @return the texture
+	 */
 	public Image getTexture() {
 		return texture;
 	}

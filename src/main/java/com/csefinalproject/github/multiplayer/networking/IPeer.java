@@ -2,6 +2,9 @@ package com.csefinalproject.github.multiplayer.networking;
 
 import com.csefinalproject.github.multiplayer.networking.packet.Packet;
 
+/**
+ * Just an interface for any peer on the network
+ */
 public interface IPeer {
     int DEFAULT_TPS = 20;
     /**
