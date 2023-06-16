@@ -36,7 +36,7 @@ public interface IPeer {
 
     /**
      * If the peer currently has a packet that needs to be processed
-     * @return
+     * @return whether this peer has a packet that needs to be proccessed
      */
     boolean hasNextPacket();
 
