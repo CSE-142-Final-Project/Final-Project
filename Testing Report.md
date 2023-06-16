@@ -12,7 +12,7 @@ as it was significantly simpler than the underlying networking code
 * Both of us launched a server and tested connect clients to it over the school network
 * We have also tested with many clients connected to one central server with all of them running on one device
 ## Dealing with bugs found by other testers
-* We didn't have any other testers :(
+* We occasionally handed the program to Max and Matthew and they never ended up finding any bugs.
 ## Unresolved bugs
 * For some bizarre reason, sometimes packets are not successfully delivered from the server to a connecting client running on the same device
 	* We can't reliably reproduce this though
