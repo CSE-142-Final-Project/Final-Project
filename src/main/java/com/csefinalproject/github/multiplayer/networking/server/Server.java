@@ -21,6 +21,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * This class is the server, it handles all the networking a server would need to handle
+ * It automatically sends keep alive packets and disconnects clients if they don't respond
+ */
 public class Server implements IPeer {
 
     private DatagramSocket socket;
@@ -33,6 +37,10 @@ public class Server implements IPeer {
 
     Thread packetWatcher;
 
+    /**
+     * This method starts the server
+     * @param port the port to listen on
+     */
     public void start(int port) {
         if (running) {
             throw new IllegalStateException("Please disconnect the server before attempting to start it again");
@@ -48,6 +56,9 @@ public class Server implements IPeer {
         packetWatcher.start();
     }
 
+    /**
+     * This method is used internally to wait and process incoming packets
+     */
     private void packetWatch() {
         while (running) {
             try {
@@ -76,7 +87,9 @@ public class Server implements IPeer {
             }
         }
     }
-
+    /**
+     * This method is used internally to process the server tick
+     */
     private void serverTick() {
         if (!running && serverThread.isRunning())
         {
@@ -95,6 +108,10 @@ public class Server implements IPeer {
         }
     }
 
+    /**
+     * This method figures out all the ip and port information
+     * @param port the port to listen on
+     */
     private void setupIpAndPort(int port) {
         ourPort = port;
         try {
@@ -110,6 +127,9 @@ public class Server implements IPeer {
         }
     }
 
+    /**
+     * This method stops the server
+     */
     public void stop() {
         if (!running) {
             throw new IllegalStateException("You can't stop a server that isn't running");
@@ -118,6 +138,12 @@ public class Server implements IPeer {
         serverThread.stop();
         socket.close();
     }
+
+    /**
+     * Send a packet on the server to a specific client
+     * @param packet packet to send
+     * @param client the ID of the client to send to
+     */
     public void send(Packet packet, short client) {
         ClientData target = connected.get(client);
         if (target == null) {
@@ -125,6 +151,11 @@ public class Server implements IPeer {
         }
         sendMessageToClient(packet,target);
     }
+
+    /**
+     * Sends a packet to all connected clients
+     * @param packet the packet to send
+     */
     public void broadcast(Packet packet) {
         Collection<ClientData> clientValues = connected.values();
         for (ClientData data : clientValues) {
@@ -132,6 +163,11 @@ public class Server implements IPeer {
         }
     }
 
+    /**
+     * Internal method to send a packet to a client from {@link ClientData}
+     * @param packet packet to send
+     * @param data client to send to
+     */
     private void sendMessageToClient(Packet packet, @NotNull ClientData data) {
         try {
             MessageUtils.sendPacketTo(socket,packet,InetAddress.getByName(data.getIP()), data.getPort());
@@ -141,32 +177,61 @@ public class Server implements IPeer {
         }
     }
 
+    /**
+     * This method gets the sender of a packet
+     * @param packet packet to get the client data from
+     * @return the client data of the sender
+     */
     public ClientData getUserFromPacket(Packet packet) {
         return ClientData.getFromIpAndPort(packet.getIp(),packet.getPort());
     }
 
-
+    /**
+     * This method gets all the connected clients
+     * @return an array of all the connected clients
+     */
     public ClientData[] getClientData() {
         return connected.values().toArray(new ClientData[0]);
     }
 
-
+    /**
+     * This method gets the next packet to be processed
+     * @return the next packet to be processed
+     */
     public synchronized Packet getNextPacket() {
         return packetsToBeProcessed.poll();
     }
+
+    /**
+     * This method checks if there is a packet to be processed
+     * @return if there is a packet to be processed
+     */
     public synchronized boolean hasNextPacket() {
         return !packetsToBeProcessed.isEmpty();
     }
 
+    /**
+     * This method gets the port the server is listening on
+     * @return the port the server is listening on
+     */
     @Override
     public int getPort() {
         return ourPort;
     }
 
+    /**
+     * This method gets the ip the server is running on
+     * @return the ip the server is running on
+     */
     @Override
     public String getIp() {
         return ourIP;
     }
+
+    /**
+     * This method checks if the server is running
+     * @return if the server is running
+     */
     @Override
     public boolean isActive() {
         return running;

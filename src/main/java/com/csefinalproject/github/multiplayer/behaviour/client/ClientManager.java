@@ -18,6 +18,9 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * This class is used to manage the client
+ */
 public class ClientManager {
 	private static ClientManager instance;
 
@@ -29,6 +32,12 @@ public class ClientManager {
 	private final KeyboardManager keyboardManager;
 	private boolean isChatting = false;
 
+	/**
+	 * Get the instance of the client manager
+	 * @param name the name of the client
+	 * @param ip the ip of the server
+	 * @param port the port of the server
+	 */
 	public ClientManager(String name, String ip, short port) {
 		instance = this;
 
@@ -58,6 +67,9 @@ public class ClientManager {
 		handler.startHandling();
 	}
 
+	/**
+	 * This method is called every tick by the client thread.
+	 */
 	private void clientTick() {
 		if (DrawingPanel.getInstances() == 0) {
 			// This is bad... but for now it works :D
@@ -109,6 +121,12 @@ public class ClientManager {
 		}
 	}
 
+	/**
+	 * Connects to the server.
+	 * @param name The name of the client.
+	 * @param ip The IP of the server.
+	 * @param port The port of the server.
+	 */
 	private void connect(String name, String ip, short port) {
 		// Try to connect
 		System.out.println("[CLIENT] Attempting connection to " + ip + " on port " + port + ".");
@@ -136,18 +154,34 @@ public class ClientManager {
 		entityList.remove(entity);
 	}
 
+	/**
+	 * Gets the instance of the client manager
+	 * @return the instance of the client manager
+	 */
 	public static ClientManager getInstance() {
 		return instance;
 	}
 
+	/**
+	 * Gets the client
+	 * @return the client (see {@link Client})
+	 */
 	public Client getClient() {
 		return client;
 	}
 
+	/**
+	 * Gets the client renderer
+	 * @return the client renderer (see {@link ClientRenderer})
+	 */
 	public ClientRenderer getClientRenderer() {
 		return clientRenderer;
 	}
 
+	/**
+	 * Gets the list of entities
+	 * @return the list of entities
+	 */
 	public List<Entity> getEntityList() {
 		return entityList;
 	}

@@ -14,6 +14,9 @@ import java.net.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * This class is used to represent a client
+ */
 public class Client implements IPeer {
     private InetAddress address;
     private String ourIp;
@@ -29,8 +32,14 @@ public class Client implements IPeer {
 
     private long lastKeepAlivePacketSent = 0L;
 
-    Thread packetWatcher;
-
+    /**
+     * This method is used to connect to a server
+     * @param ip the ip of the server
+     * @param port the port of the server
+     * @param username the username to join as
+     * @throws ConnectionFailedException if the connection failed
+     * @throws UnknownHostException if the host was not found
+     */
     public void connect(String ip, int port, String username) throws ConnectionFailedException, UnknownHostException {
         if (isConnected) {
             throw new IllegalStateException("Please disconnect the client before attempting to connect again");
@@ -41,12 +50,18 @@ public class Client implements IPeer {
 
 
         clientThread = new Ticker(IPeer.DEFAULT_TPS);
-        packetWatcher = new Thread(this::packetWatch);
+        Thread packetWatcher = new Thread(this::packetWatch);
         clientThread.subscribe(this::clientTick);
         clientThread.start();
         packetWatcher.start();
     }
 
+    /**
+     * This method is used to set up our ip and port information and get the address of the server
+     * @param ip the ip to connect to
+     * @param port the port to connect to
+     * @throws UnknownHostException if the host was not found
+     */
     private void setupIpAndPort(String ip, int port) throws UnknownHostException {
         address = InetAddress.getByName(ip);
         targetPort = port;
@@ -64,6 +79,11 @@ public class Client implements IPeer {
         this.ourPort = socket.getLocalPort();
     }
 
+    /**
+     * This method is used internally to try to connect to the server
+     * @param username the username to connect as
+     * @throws ConnectionFailedException if the connection times out
+     */
     private void tryToConnect(String username) throws ConnectionFailedException {
         final Packet connectionPacket = new ConnectionPacket(this,username);
         // Send a packet to the server saying that we want to connect
@@ -73,6 +93,9 @@ public class Client implements IPeer {
 
     }
 
+    /**
+     * This method is used internally and run every tick. It does everything the client needs to do every tick
+     */
     private void clientTick() {
         if (!isConnected && clientThread.isRunning()) {
             clientThread.stop();
@@ -90,6 +113,10 @@ public class Client implements IPeer {
             disconnect();
         }
     }
+
+    /**
+     * This method is used internally to watch for packets
+     */
     private void packetWatch() {
         while (isConnected) {
             try {
@@ -108,7 +135,9 @@ public class Client implements IPeer {
         }
     }
 
-
+    /**
+     * This method is used to disconnect from the server
+     */
     public void disconnect() {
         if (!isConnected) {
             throw new IllegalStateException("Can't disconnect if we are not connected");
@@ -117,6 +146,10 @@ public class Client implements IPeer {
         socket.close();
     }
 
+    /**
+     * This method is used to send a packet to the server
+     * @param packet the packet to send
+     */
     public void sendPacket(Packet packet) {
         if (isConnected) {
             MessageUtils.sendPacketTo(socket, packet, address, targetPort);
@@ -126,29 +159,55 @@ public class Client implements IPeer {
         }
     }
 
+    /**
+     * This method is used to get the time since the last keep alive packet was received from the server
+     * @return the time since the last keep alive packet was received from the server
+     */
     public double lastKeepAlivePacketTime() {
         return (lastKeepAlivePacketTime - System.currentTimeMillis()) / 1000.0;
     }
 
-
+    /**
+     * This method is used to get the next packet from the server
+     * @return the next packet from the server
+     */
     @Override
     public synchronized Packet getNextPacket() {
         return packetsReceived.poll();
     }
+
+    /**
+     * This method is used to check if there is a packet available
+     * @return true if there is a packet available, false otherwise
+     */
     @Override
     public synchronized boolean hasNextPacket() {
         return !packetsReceived.isEmpty();
     }
+
+    /**
+     * This method is used to get the ip of the client
+     * @return the ip of the client
+     */
     @Override
     public String getIp() {
         return ourIp;
     }
+
+    /**
+     * This method is used to get the port of the client
+     * @return the port of the client
+     */
     @Override
     public int getPort() {
         return ourPort;
     }
-    @Override
 
+    /**
+     * This method is used to check if the client is active
+     * @return true if the client is active, false otherwise
+     */
+    @Override
     public boolean isActive() {
         return isConnected;
     }
