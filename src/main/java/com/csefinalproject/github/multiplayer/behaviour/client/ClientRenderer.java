@@ -1,6 +1,7 @@
 package com.csefinalproject.github.multiplayer.behaviour.client;
 
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
+import com.csefinalproject.github.multiplayer.behaviour.client.chat.ChatBox;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 
 import java.awt.*;
@@ -11,6 +12,7 @@ public class ClientRenderer {
 	private final int screenHeight;
 
 	private final DrawingPanel drawingPanel;
+	private final ChatBox chatBox;
 
 	public ClientRenderer() {
 		this(DrawingPanel.DEFAULT_WIDTH, DrawingPanel.DEFAULT_HEIGHT);
@@ -27,9 +29,12 @@ public class ClientRenderer {
 
 		System.out.println("[CLIENT] Creating DrawingPanel.");
 		this.drawingPanel = new DrawingPanel(this.screenWidth, this.screenHeight);
+
+		System.out.println("[CLIENT] Creating Chat Box");
+		this.chatBox = new ChatBox(this);
 	}
 
-	public void DrawEntities(List<Entity> entities) {
+	public void UpdateVisuals(List<Entity> entities) {
 		Graphics g = this.drawingPanel.getGraphics();
 
 		// Reset screen
@@ -40,6 +45,9 @@ public class ClientRenderer {
 		for(Entity entity : entities) {
 			entity.Draw(this.drawingPanel, g);
 		}
+
+		// Update the chat box
+		this.chatBox.updateChatBox();
 
 		this.drawingPanel.sleep(1);
 	}
@@ -54,5 +62,9 @@ public class ClientRenderer {
 
 	public DrawingPanel getDrawingPanel() {
 		return drawingPanel;
+	}
+
+	public ChatBox getChatBox() {
+		return chatBox;
 	}
 }

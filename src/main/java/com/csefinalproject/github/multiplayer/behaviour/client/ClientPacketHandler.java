@@ -3,6 +3,7 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
+import com.csefinalproject.github.multiplayer.networking.packet.ChatPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerJoinedPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket;
 import com.csefinalproject.github.multiplayer.networking.packet.PositionPacket;
@@ -22,6 +23,7 @@ public class ClientPacketHandler {
         this.networkEventManager.subscribeEvent(PlayerJoinedPacket.class, (PlayerJoinedPacket packet) -> handleNewPlayer(packet));
         this.networkEventManager.subscribeEvent(PlayerLeftPacket.class, (PlayerLeftPacket packet) -> handlePlayerLeave(packet));
         this.networkEventManager.subscribeEvent(PositionPacket.class, (PositionPacket packet) -> handleMovement(packet));
+        this.networkEventManager.subscribeEvent(ChatPacket.class, (ChatPacket packet) -> handleChatMessage(packet));
     }
 
     private void handleNewPlayer(PlayerJoinedPacket packet) {
@@ -46,5 +48,16 @@ public class ClientPacketHandler {
                 entity.setPosition(packet.getPosition());
             }
         }
+    }
+
+    /**
+     * This method is used to handle a new chat message
+     * @param packet the chat message packet
+     */
+    private void handleChatMessage(ChatPacket packet) {
+        String message = packet.getMessage();
+
+        // Add the message to the chat box
+        this.clientManager.getClientRenderer().getChatBox().addMessage(message);
     }
 }

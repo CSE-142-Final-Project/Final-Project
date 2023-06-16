@@ -1,4 +1,4 @@
-package com.csefinalproject.github.multiplayer.behaviour.client.keyboard;
+package com.csefinalproject.github.multiplayer.behaviour.client.chat;
 
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 

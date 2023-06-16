@@ -3,7 +3,7 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.Main;
-import com.csefinalproject.github.multiplayer.behaviour.client.keyboard.KeyboardManager;
+import com.csefinalproject.github.multiplayer.behaviour.client.chat.KeyboardManager;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
@@ -69,7 +69,7 @@ public class ClientManager {
 		}
 
 		// Draw all the entities
-		this.clientRenderer.DrawEntities(entityList);
+		this.clientRenderer.UpdateVisuals(entityList);
 
 		// If we're looking to chat, start a chat.
 		if(this.panelInput.keyDown('t') && !this.isChatting) {
