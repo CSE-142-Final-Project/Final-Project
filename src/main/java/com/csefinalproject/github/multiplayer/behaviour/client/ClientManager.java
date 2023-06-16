@@ -3,8 +3,8 @@ package com.csefinalproject.github.multiplayer.behaviour.client;
 import com.buildingjavaprograms.drawingpanel.DrawingPanel;
 import com.buildingjavaprograms.drawingpanel.PanelInput;
 import com.csefinalproject.github.multiplayer.Main;
+import com.csefinalproject.github.multiplayer.behaviour.client.chat.KeyboardManager;
 import com.csefinalproject.github.multiplayer.behaviour.shared.Entity;
-import com.csefinalproject.github.multiplayer.behaviour.shared.Player;
 import com.csefinalproject.github.multiplayer.networking.NetworkEventManager;
 import com.csefinalproject.github.multiplayer.networking.client.Client;
 import com.csefinalproject.github.multiplayer.networking.exceptions.ConnectionFailedException;
@@ -15,7 +15,6 @@ import com.csefinalproject.github.multiplayer.networking.packet.PlayerLeftPacket
 import com.csefinalproject.github.multiplayer.util.Ticker;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -29,7 +28,9 @@ public class ClientManager {
 	private final ClientRenderer clientRenderer;
 	private final PanelInput panelInput;
 	private final List<Entity> entityList = new CopyOnWriteArrayList<>();
-	final Ticker clientThread;
+	private final Ticker clientThread;
+	private final KeyboardManager keyboardManager;
+	private boolean isChatting = false;
 
 	/**
 	 * Get the instance of the client manager
@@ -51,6 +52,7 @@ public class ClientManager {
 		System.out.println("[CLIENT] Creating ClientRenderer and Input.");
 		this.clientRenderer = new ClientRenderer();
 		this.panelInput = new PanelInput(clientRenderer.getDrawingPanel());
+		this.keyboardManager = new KeyboardManager(panelInput);
 
 		// Create client thread
 		this.clientThread = new Ticker(Main.TPS);
@@ -78,18 +80,45 @@ public class ClientManager {
 			return;
 		}
 
+		// Draw all the entities
+		this.clientRenderer.UpdateVisuals(entityList);
+
+		// If we're looking to chat, start a chat.
+		if(this.panelInput.keyDown('t') && !this.isChatting) {
+			this.isChatting = true;
+			this.panelInput.flushKeyboardEvents();
+		}
+
+		// If we're chatting, keep checking for keyboard events.
+		if(this.isChatting) {
+			// Update the chat and set isChatting to if we're done or not
+			this.isChatting = !this.keyboardManager.updateChat();
+
+			String currentMessage = this.keyboardManager.getText();
+
+			// Draw the chat message
+			this.clientRenderer.getDrawingPanel().getGraphics().drawString(
+					"Type your chat message: " + currentMessage,
+					2, 10
+			);
+
+			if(!this.isChatting) {
+				this.client.sendPacket(new ChatPacket(this.client, currentMessage));
+			}
+
+			// Return, we don't want to do anything else.
+			return;
+		}
+
 		// Input
-		boolean w = panelInput.keyDown('w');
-		boolean s = panelInput.keyDown('s');
-		boolean a = panelInput.keyDown('a');
-		boolean d = panelInput.keyDown('d');
+		boolean w = panelInput.keyDown('w') || panelInput.keyDown('W');
+		boolean s = panelInput.keyDown('s') || panelInput.keyDown('S');
+		boolean a = panelInput.keyDown('a') || panelInput.keyDown('A');
+		boolean d = panelInput.keyDown('d') || panelInput.keyDown('D');
 
 		if(w || s || a || d) {
 			client.sendPacket(new InputDataPacket(client, w, s, a, d, 0));
 		}
-
-		// Draw all the entities
-		this.clientRenderer.DrawEntities(entityList);
 	}
 
 	/**
@@ -155,5 +184,9 @@ public class ClientManager {
 	 */
 	public List<Entity> getEntityList() {
 		return entityList;
+	}
+
+	public boolean isChatting() {
+		return isChatting;
 	}
 }
