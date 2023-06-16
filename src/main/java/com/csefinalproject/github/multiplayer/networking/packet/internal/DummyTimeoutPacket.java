@@ -8,7 +8,7 @@ import com.csefinalproject.github.multiplayer.networking.server.ClientData;
  * This packet should never be sent over the network. It is added as a packet the server recieved when a client times out
  */
 public class DummyTimeoutPacket extends Packet {
-    final ClientData data;
+    private final ClientData data;
 
     /**
      * This constructor is used to create a new dummy timeout packet

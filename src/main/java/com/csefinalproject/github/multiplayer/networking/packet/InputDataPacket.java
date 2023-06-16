@@ -10,11 +10,11 @@ public class InputDataPacket extends Packet{
      * For serialization
      */
     public static final long serialVersionUID = SerialIds.INPUT_PACKET;
-    final boolean forward;
-    final boolean backward;
-    final boolean left;
-    final boolean right;
-    final double degrees;
+    private final boolean forward;
+    private final boolean backward;
+    private final boolean left;
+    private final boolean right;
+    private final double degrees;
 
     /**
      * This constructor is used to create a new player input packet

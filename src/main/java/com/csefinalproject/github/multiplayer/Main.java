@@ -11,9 +11,18 @@ import java.util.Scanner;
  * This class is responsible for getting command line input and starting the program
  */
 public class Main {
+	/**
+	 * The Ticks per
+	 */
 
 	public static final int TPS = 20;
 
+	/**
+	 * Runs the program
+	 * @param args when you launch the program, you can launch it with command line arguments the arguments that are
+	 *             usable are
+	 *             --username --ip --port --server --client
+	 */
 	public static void main(String[] args) {
 		// Get if the input from the user.
 		Scanner console = new Scanner(System.in);

@@ -186,6 +186,10 @@ public class ClientManager {
 		return entityList;
 	}
 
+	/**
+	 * This method can be used to see if the user is currently typing a message
+	 * @return if the player is currently chatting
+	 */
 	public boolean isChatting() {
 		return isChatting;
 	}

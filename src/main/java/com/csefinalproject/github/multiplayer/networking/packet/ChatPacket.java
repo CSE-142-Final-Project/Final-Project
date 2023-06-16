@@ -2,6 +2,8 @@ package com.csefinalproject.github.multiplayer.networking.packet;
 
 import com.csefinalproject.github.multiplayer.networking.IPeer;
 
+import java.io.Serial;
+
 /**
  * This packet is used to send chat messages
  */
@@ -9,8 +11,9 @@ public class ChatPacket extends Packet {
     /**
      * For serialization
      */
-    static final long serialVersionUID = SerialIds.CHAT_PACKET;
-    final String message;
+    @Serial
+    private static final long serialVersionUID = SerialIds.CHAT_PACKET;
+    private final String message;
 
     /**
      * This constructor is used to create a new chat packet

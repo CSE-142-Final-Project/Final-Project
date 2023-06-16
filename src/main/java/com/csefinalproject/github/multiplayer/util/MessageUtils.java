@@ -66,6 +66,7 @@ public class MessageUtils {
      * @param socket socket to wait on
      * @return the packet we got
      * @throws PacketDecodeError if we cant decode the packet
+     * @throws SocketException if the socket is closed
      */
     public static Packet waitForPacket(@NotNull DatagramSocket socket) throws PacketDecodeError, SocketException {
         return decodePacket(receivePacket(socket));

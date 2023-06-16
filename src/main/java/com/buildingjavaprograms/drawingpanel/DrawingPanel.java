@@ -149,7 +149,7 @@ import javax.swing.filechooser.FileFilter;
  * and comment them out or remove those lines.
  * Then the file should compile and run properly on older versions of Java.
  * 
- * <h3>Description:</h3>
+ * Description:
  * 
  * <p>
  * The {@code com.buildingjavaprograms.drawingpanel.DrawingPanel} class provides a simple interface for drawing persistent
@@ -168,7 +168,7 @@ import javax.swing.filechooser.FileFilter;
  * like object-oriented drawing of shapes, animations, creating games, etc.
  * </p>
  * 
- * <h3>Example basic usage:</h3>
+ * Example Basic usage
  * 
  * <p>
  * Here is a canonical example of creating a {@code com.buildingjavaprograms.drawingpanel.DrawingPanel} of a given size and
@@ -190,7 +190,7 @@ import javax.swing.filechooser.FileFilter;
  * regular intervals.
  * </p>
  * 
- * <h3>Pixel processing (new in BJP 4th edition):</h3>
+ * Pixel processing (new in BJP 4th edition):
  * 
  * <p>
  * This version of {@code com.buildingjavaprograms.drawingpanel.DrawingPanel} allows you to loop over the pixels of an image.
@@ -218,7 +218,7 @@ import javax.swing.filechooser.FileFilter;
  * }
  * </pre>
  * 
- * <h3>Event listeners and lambdas (new in BJP 4th edition):</h3>
+ * Event listeners and lambdas (new in BJP 4th edition):
  * 
  * <p>
  * With Java 8, you can now attach event handlers to listen to keyboard and mouse
@@ -229,7 +229,7 @@ import javax.swing.filechooser.FileFilter;
  * panel.onClick( (x, y) -&gt; System.out.println(x + " " + y) );
  * </pre>
  
- * <h3>Debugging facilities (new in BJP 4th edition):</h3>
+ * Debugging facilities (new in BJP 4th edition):
  * 
  * <p>
  * This version now includes an inner class named {@code DebuggingGraphics}
@@ -251,7 +251,7 @@ import javax.swing.filechooser.FileFilter;
  * System.out.println(panel.getCounts());
  * </pre>
  * 
- * <h3>History and recent changes:</h3>
+ * History and recent changes:
  * 
  * 2022/04/07
  * - Minor update to remove a security manager-related compiler warning in JDK 17+.

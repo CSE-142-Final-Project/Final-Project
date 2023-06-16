@@ -56,6 +56,11 @@ public class Entity {
 		ClientManager.getInstance().AddEntity(this);
 	}
 
+	/**
+	 * Draws the texture of this entity
+	 * @param panel the panel to draw to
+	 * @param g the graphics object to draw to
+	 */
 	public void Draw(DrawingPanel panel, Graphics g) {
 		// Draw texture
 		g.drawImage(getTexture(), this.getPosition().x - (SIZE / 2), this.getPosition().y - (SIZE / 2), SIZE, SIZE, null, null);

@@ -18,7 +18,7 @@ public class ClientRenderer {
 	private final ChatBox chatBox;
 
 	/**
-	 * This constructor is used to create a new client renderer (It uses the {@link DrawingPanel#DEFAULT_WIDTH} and {@link DrawingPanel#DEFAULT_HEIGHT
+	 * This constructor is used to create a new client renderer (It uses the {@link DrawingPanel#DEFAULT_WIDTH} and {@link DrawingPanel#DEFAULT_HEIGHT}
 	 */
 	public ClientRenderer() {
 		this(DrawingPanel.DEFAULT_WIDTH, DrawingPanel.DEFAULT_HEIGHT);
@@ -85,12 +85,15 @@ public class ClientRenderer {
 
 	/**
 	 * This method is used to get the drawing panel
-	 * @return
+	 * @return the drawing panel
 	 */
 	public DrawingPanel getDrawingPanel() {
 		return drawingPanel;
 	}
 
+	/**
+	 * @return the chat box object on the screen
+	 */
 	public ChatBox getChatBox() {
 		return chatBox;
 	}
